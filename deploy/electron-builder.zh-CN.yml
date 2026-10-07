@@ -11,14 +11,8 @@ win:
     - target: zip
       arch: [x64]
   extraResources:
-    - from: vendor/ffmpeg/win-x64/ffmpeg.exe
-      to: ffmpeg/ffmpeg.exe
-    - from: vendor/ffmpeg/win-x64/ffprobe.exe
-      to: ffmpeg/ffprobe.exe
-    - from: vendor/ffmpeg/win-x64/LICENSE.txt
-      to: licenses/FFmpeg-GPL-3.0.txt
-    - from: third_party/ffmpeg/PROVENANCE.md
-      to: ffmpeg/PROVENANCE.md
+    # FFmpeg executables, GPL license and provenance are inherited once from
+    # the base win.extraResources. Extends concatenates these arrays.
     - from: release/ffmpeg-corresponding-source
       to: ffmpeg-source/archives
     - from: docs/DEPLOY-WINDOWS.zh-CN.md

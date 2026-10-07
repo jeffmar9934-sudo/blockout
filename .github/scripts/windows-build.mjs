@@ -8,9 +8,11 @@ const result = spawnSync(process.execPath, ['deploy/package-windows-zh.mjs'], {
 const output = [result.stdout, result.stderr, result.error?.message]
   .filter(Boolean).join('\n')
   .replace(/github_pat_[A-Za-z0-9_]+|gh[pousr]_[A-Za-z0-9_]+/g, '[credential omitted]')
-  .replace(/https?:\/\/[^\s]+/g, '[URL omitted]')
+  .replace(/https?:\/\/[^\s]+/gi, '[URL omitted]')
 // Child output cannot inject workflow commands into the runner.
-for (const line of output.split(/\r?\n/)) console.log(`build | ${line}`)
+for (const line of output.split(/\r?\n/)) {
+  console.log(`build | ${line.replaceAll('::', ': :').replaceAll('##[', '## [')}`)
+}
 const status = result.status ?? 1
 if (status !== 0) {
   const detail = output.split(/\r?\n/).slice(-80).join('\n')
