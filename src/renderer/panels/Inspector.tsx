@@ -7,9 +7,10 @@
  */
 
 import { useStore } from '../store'
+import { zh } from '../i18n/zh-CN'
 import { emit } from '../bus'
 import { useState } from 'react'
-import { SENSORS, LENS_SET } from '@engine/camera'
+import { SENSORS, LENS_SET, SHOT_SIZES } from '@engine/camera'
 import { GAITS } from '@engine/gaits'
 import { RIGS } from '@engine/rigs'
 import { MOTION_PRESETS, type MotionPreset } from '@engine/motions'
@@ -40,16 +41,16 @@ const toRad = (deg: number): number => (deg * Math.PI) / 180
 const SWATCHES = ['#e5484d', '#f5a524', '#46a758', '#3b82f6', '#a855f7', '#ec4899', '#14b8a6', '#f97316']
 
 const LIGHTING: { id: LightingPresetId; label: string }[] = [
-  { id: 'day', label: 'Day' },
-  { id: 'goldenHour', label: 'Golden' },
-  { id: 'night', label: 'Night' },
-  { id: 'interiorWarm', label: 'Warm Int' },
-  { id: 'interiorCool', label: 'Cool Int' },
-  { id: 'club', label: 'Club' },
+  { id: 'day', label: '白天' },
+  { id: 'goldenHour', label: '黄金时段' },
+  { id: 'night', label: '夜晚' },
+  { id: 'interiorWarm', label: '暖色室内' },
+  { id: 'interiorCool', label: '冷色室内' },
+  { id: 'club', label: '夜店' },
   // Physical-sky presets (real atmospheric dome, deterministic).
-  { id: 'middaySky', label: 'Midday Sky' },
-  { id: 'goldenHourSky', label: 'Golden Sky' },
-  { id: 'blueHourSky', label: 'Blue Hour Sky' }
+  { id: 'middaySky', label: '正午天空' },
+  { id: 'goldenHourSky', label: '黄金时段天空' },
+  { id: 'blueHourSky', label: '蓝调时刻天空' }
 ]
 
 const ASPECTS: AspectId[] = ['16:9', '9:16', '2.39:1', '4:3', '1:1']
@@ -114,23 +115,23 @@ export function Inspector(): JSX.Element {
           <button
             className={tab === 'auto' ? 'active' : ''}
             onClick={() => setTab('auto')}
-            title="Show whatever is selected"
+            title="显示当前选择的属性"
           >
-            Selection
+            当前选择
           </button>
           <button
             className={tab === 'camera' ? 'active' : ''}
             onClick={() => setTab('camera')}
-            title="Pin the camera controls: lens, position, aim, rig, moves, tracking — always here, no matter what's selected"
+            title="固定显示摄影机控制：焦距、位置、朝向、支撑方式、运镜和跟踪，不受当前选择影响"
           >
-            🎥 Camera
+            🎥 摄影机
           </button>
           <button
             className={tab === 'animate' ? 'active' : ''}
             onClick={() => setTab('animate')}
-            title="Make the selection perform: fights, dances, sit/drink/jump, flights and drives — or restyle a whole selected group at once"
+            title="为所选对象添加打斗、舞蹈、坐下、喝水、跳跃、飞行或驾驶动作，也可一次调整整组选中对象"
           >
-            ✨ Animate
+            ✨ 动作
           </button>
         </div>
       </div>
@@ -151,13 +152,13 @@ function AnimateTab({ scene, shot }: { scene: Scene; shot: Shot }): JSX.Element 
 
   if (selection?.kind === 'entity') {
     const entity = scene.entities.find((e) => e.id === selection.entityId)
-    if (!entity) return <div className="panel-section">Entity not found.</div>
+    if (!entity) return <div className="panel-section">未找到对象。</div>
     return (
       <div>
         <div className="panel-section">
-          <div className="panel-title">Animating: {entity.label?.text || entity.name}</div>
+          <div className="panel-title">动作对象： {entity.label?.text || entity.name}</div>
           <p style={{ color: 'var(--text-faint)', fontSize: 11, lineHeight: 1.4 }}>
-            Presets drop editable marks at the playhead — apply, press ▶, then tweak any mark.
+            预设会从播放头位置添加可编辑的标记。应用后按 ▶ 预览，再调整各个标记。
           </p>
         </div>
         {entity.assetId.startsWith('person.') && (
@@ -174,14 +175,13 @@ function AnimateTab({ scene, shot }: { scene: Scene; shot: Shot }): JSX.Element 
 
   return (
     <div className="panel-section">
-      <div className="panel-title">✨ Animate</div>
+      <div className="panel-title">✨ 动作</div>
       <p style={{ color: 'var(--text-dim)', fontSize: 12, lineHeight: 1.6 }}>
-        Select a <b>character</b> to give them a fight move, a dance, a sit-down, a drink — or a{' '}
-        <b>vehicle/prop</b> for takeoffs, chases, and falls.
+        选择一名<b>角色</b>，为其添加打斗、舞蹈、坐下或喝水等动作；也可选择
+        <b>车辆或道具</b>，添加起飞、追逐或坠落动作。
         <br />
         <br />
-        ⇧-click <b>several performers</b> (or stage a Sequence from the Library) and this tab
-        restyles the whole group at once — swap the dance style, change everyone&apos;s move.
+        按住 ⇧ 点击选择<b>多名角色</b>（或从资源库添加动作序列），即可在此一次调整全组动作，例如更换舞蹈风格。
       </p>
     </div>
   )
@@ -204,22 +204,21 @@ function GroupAnimateSection({ entityIds }: { entityIds: string[] }): JSX.Elemen
   return (
     <div>
       <div className="panel-section">
-        <div className="panel-title">Animate {entityIds.length} together</div>
+        <div className="panel-title">让 {entityIds.length} 个对象一起表演</div>
         <p style={{ color: 'var(--text-faint)', fontSize: 11, lineHeight: 1.4 }}>
-          Replaces each performer&apos;s choreography in place — a staged sequence is just a
-          starting point. One undo step.
+          在当前位置替换每名角色的动作编排。已添加的序列只是起点，一次撤销即可还原。
         </p>
       </div>
       {people.length > 0 && (
         <div className="panel-section">
-          <div className="panel-title">Everyone performs ({people.length} people)</div>
+          <div className="panel-title">全员表演 ({people.length} 人)</div>
           <div className="field">
             <select value={motionId} onChange={(e) => setMotionId(e.target.value)}>
               {motionCats.map((cat) => (
-                <optgroup key={cat} label={cat.toUpperCase()}>
+                <optgroup key={cat} label={zh(cat)}>
                   {MOTION_PRESETS.filter((p) => p.category === cat).map((p) => (
                     <option key={p.id} value={p.id}>
-                      {p.name}
+                      {zh(p.name)}
                     </option>
                   ))}
                 </optgroup>
@@ -231,19 +230,19 @@ function GroupAnimateSection({ entityIds }: { entityIds: string[] }): JSX.Elemen
             style={{ width: '100%' }}
             onClick={() => applyMotionToEntities(people, motionId)}
           >
-            Apply to all {people.length}
+            应用到全部 {people.length} 名角色
           </button>
         </div>
       )}
       <div className="panel-section">
-        <div className="panel-title">Everyone travels ({entityIds.length})</div>
+        <div className="panel-title">全员移动 ({entityIds.length})</div>
         <div className="field">
           <select value={actionId} onChange={(e) => setActionId(e.target.value)}>
             {actionCats.map((cat) => (
-              <optgroup key={cat} label={cat.toUpperCase()}>
+              <optgroup key={cat} label={zh(cat)}>
                 {ACTION_PRESETS.filter((p) => p.category === cat).map((p) => (
                   <option key={p.id} value={p.id}>
-                    {p.name}
+                    {zh(p.name)}
                   </option>
                 ))}
               </optgroup>
@@ -254,9 +253,9 @@ function GroupAnimateSection({ entityIds }: { entityIds: string[] }): JSX.Elemen
           className="btn"
           style={{ width: '100%' }}
           onClick={() => applyActionToEntities(entityIds, actionId)}
-          title="Every selected performer gets this path from its own spot and facing — a convoy of takeoffs, a synchronized chase"
+          title="每个所选对象都从自身位置和朝向沿此路径移动，可用于编队起飞或同步追逐"
         >
-          Apply path to all
+          为全组选用此路径
         </button>
       </div>
     </div>
@@ -294,31 +293,31 @@ function ScansSection({ scene }: { scene: Scene }): JSX.Element {
 
   return (
     <div className="panel-section">
-      <div className="panel-title">3D scans</div>
+      <div className="panel-title">3D 扫描</div>
       {(scene.scans ?? []).map((scan) => (
         <div key={scan.id} className="field-row" style={{ alignItems: 'center', gap: 6 }}>
           <button
             className="btn"
             style={{ flex: 1, textAlign: 'left', overflow: 'hidden', textOverflow: 'ellipsis' }}
             onClick={() => setSelection(scan.id)}
-            title="Select this scan to edit its position, rotation, and scale"
+            title="选择此扫描，编辑位置、旋转和缩放"
           >
             🏙 {scan.name}
           </button>
           <button
             className="btn"
             onClick={() => setScanVisible(scan.id, !scan.visible)}
-            title={scan.visible ? 'Hide in the editor viewport' : 'Show in the editor viewport'}
+            title={scan.visible ? '在编辑器视口中隐藏' : '在编辑器视口中显示'}
           >
             {scan.visible ? '👁' : '—'}
           </button>
-          <button className="btn" onClick={() => removeScan(scan.id)} title="Remove from scene (file stays in the project)">
+          <button className="btn" onClick={() => removeScan(scan.id)} title="从场景移除（文件仍保留在项目中）">
             ✕
           </button>
         </div>
       ))}
       <p style={{ color: 'var(--text-faint)', fontSize: 11, lineHeight: 1.4, margin: '4px 0 0' }}>
-        Editor staging only — scans never render into exports.
+        扫描仅用于编辑器中的布景和走位，不会出现在导出画面中。
       </p>
     </div>
   )
@@ -328,7 +327,7 @@ function ScansSection({ scene }: { scene: Scene }): JSX.Element {
 function ScanInspector({ scene, scanId }: { scene: Scene; scanId: string }): JSX.Element {
   const updateScanTransform = useStore((s) => s.updateScanTransform)
   const scan = scene.scans?.find((s) => s.id === scanId)
-  if (!scan) return <div className="panel-section">Scan not found.</div>
+  if (!scan) return <div className="panel-section">未找到扫描。</div>
 
   const num = (v: number): string => String(Math.round(v * 100) / 100)
 
@@ -355,7 +354,7 @@ function ScanInspector({ scene, scanId }: { scene: Scene; scanId: string }): JSX
         </div>
         <div className="field-row">
           <div className="field" style={{ flex: 1 }}>
-            <label>Rotation (°)</label>
+            <label>旋转 (°)</label>
             <input
               type="number"
               step={5}
@@ -366,7 +365,7 @@ function ScanInspector({ scene, scanId }: { scene: Scene; scanId: string }): JSX
             />
           </div>
           <div className="field" style={{ flex: 1 }}>
-            <label>Scale</label>
+            <label>缩放</label>
             <input
               type="number"
               step={0.1}
@@ -382,12 +381,10 @@ function ScanInspector({ scene, scanId }: { scene: Scene; scanId: string }): JSX
             checked={scan.flipped === true}
             onChange={(e) => updateScanTransform(scanId, { flipped: e.target.checked })}
           />
-          Upside-down scan (flip it)
+          扫描上下颠倒（翻转）
         </label>
         <p style={{ color: 'var(--text-faint)', fontSize: 11, lineHeight: 1.4 }}>
-          Line the scan's floor up with the grid, then stage and block inside it. Many phone/.splat
-          exports load upside-down — tick the flip if the world hangs from the ceiling. Scans are
-          editor staging only and never render into exports.
+          先将扫描地面对齐网格，再在其中布景和安排走位。部分手机扫描或 .splat 文件载入后会上下颠倒，此时勾选翻转。扫描仅用于编辑，不会出现在导出画面中。
         </p>
       </div>
     </div>
@@ -409,9 +406,9 @@ function SceneInspector({ scene, shot }: { scene: Scene; shot: Shot }): JSX.Elem
   return (
     <div>
       <div className="panel-section">
-        <div className="panel-title">Scene</div>
+        <div className="panel-title">场景</div>
         <div className="field">
-          <label>Name</label>
+          <label>名称</label>
           <input
             type="text"
             value={scene.name}
@@ -425,7 +422,7 @@ function SceneInspector({ scene, shot }: { scene: Scene; shot: Shot }): JSX.Elem
         </div>
         {mode === 'stage' && (
           <p style={{ color: 'var(--text-faint)', fontSize: 12, lineHeight: 1.5 }}>
-            Click a library item, then click the floor to place it.
+            点击资源库中的对象，再点击地面放置。
           </p>
         )}
       </div>
@@ -433,7 +430,7 @@ function SceneInspector({ scene, shot }: { scene: Scene; shot: Shot }): JSX.Elem
       {(scene.scans?.length ?? 0) > 0 && <ScansSection scene={scene} />}
 
       <div className="panel-section">
-        <div className="panel-title">Lighting</div>
+        <div className="panel-title">灯光</div>
         <div className="seg" style={{ marginBottom: 10 }}>
           {LIGHTING.map((l) => (
             <button
@@ -446,7 +443,7 @@ function SceneInspector({ scene, shot }: { scene: Scene; shot: Shot }): JSX.Elem
           ))}
         </div>
         <div className="field">
-          <label>Sun azimuth</label>
+          <label>太阳方位角</label>
           <input
             type="range"
             min={0}
@@ -460,7 +457,7 @@ function SceneInspector({ scene, shot }: { scene: Scene; shot: Shot }): JSX.Elem
           />
         </div>
         <div className="field">
-          <label>Sun elevation</label>
+          <label>太阳高度角</label>
           <input
             type="range"
             min={0.1}
@@ -474,7 +471,7 @@ function SceneInspector({ scene, shot }: { scene: Scene; shot: Shot }): JSX.Elem
           />
         </div>
         <div className="field">
-          <label>Fog</label>
+          <label>雾</label>
           <input
             type="range"
             min={0}
@@ -501,9 +498,9 @@ function ShotSection({ scene, shot }: { scene: Scene; shot: Shot }): JSX.Element
 
   return (
     <div className="panel-section">
-      <div className="panel-title">Shot</div>
+      <div className="panel-title">镜头</div>
       <div className="field">
-        <label>Duration (s)</label>
+        <label>时长 (s)</label>
         <input
           type="number"
           min={0.5}
@@ -527,7 +524,7 @@ function ShotSection({ scene, shot }: { scene: Scene; shot: Shot }): JSX.Element
         />
       </div>
       <div className="field">
-        <label>Aspect</label>
+        <label>画幅比例</label>
         <div className="seg">
           {ASPECTS.map((a) => (
             <button
@@ -546,7 +543,7 @@ function ShotSection({ scene, shot }: { scene: Scene; shot: Shot }): JSX.Element
         </div>
       </div>
       <div className="field">
-        <label>Notes</label>
+        <label>备注</label>
         <textarea
           rows={3}
           value={shot.notes ?? ''}
@@ -579,7 +576,7 @@ function EntityInspector({
   const setDroppingMarks = useStore((s) => s.setDroppingMarks)
 
   const entity = scene.entities.find((e) => e.id === entityId)
-  if (!entity) return <div className="panel-section">Entity not found.</div>
+  if (!entity) return <div className="panel-section">未找到对象。</div>
 
   const isPerson = entity.assetId.startsWith('person.')
 
@@ -601,9 +598,9 @@ function EntityInspector({
   return (
     <div>
       <div className="panel-section">
-        <div className="panel-title">Entity</div>
+        <div className="panel-title">对象</div>
         <div className="field">
-          <label>Name</label>
+          <label>名称</label>
           <input
             type="text"
             value={entity.name}
@@ -649,7 +646,7 @@ function EntityInspector({
           </div>
         </div>
         <div className="field">
-          <label>Rotation°</label>
+          <label>旋转角度 (°)</label>
           <input
             type="number"
             step={1}
@@ -661,7 +658,7 @@ function EntityInspector({
           />
         </div>
         <div className="field">
-          <label>Scale ({entity.transform.scale.toFixed(2)})</label>
+          <label>缩放比例 ({entity.transform.scale.toFixed(2)})</label>
           <input
             type="range"
             min={0.3}
@@ -677,7 +674,7 @@ function EntityInspector({
         {isPerson && (
           <>
             <div className="field">
-              <label>Height ({heightParam.toFixed(2)})</label>
+              <label>身高系数 ({heightParam.toFixed(2)})</label>
               <input
                 type="range"
                 min={0.8}
@@ -694,7 +691,7 @@ function EntityInspector({
               />
             </div>
             <div className="field">
-              <label>Build ({buildParam.toFixed(2)})</label>
+              <label>体型系数 ({buildParam.toFixed(2)})</label>
               <input
                 type="range"
                 min={0.8}
@@ -726,7 +723,7 @@ function EntityInspector({
               }}
               style={{ width: 'auto', marginRight: 6 }}
             />
-            Hide in exports
+            导出时隐藏
           </label>
         </div>
       </div>
@@ -737,11 +734,11 @@ function EntityInspector({
 
 
       <div className="panel-section">
-        <div className="panel-title">Label</div>
+        <div className="panel-title">标签</div>
         <div className="field-row" style={{ marginBottom: 8 }}>
           <input
             type="text"
-            placeholder="Label text"
+            placeholder="标签文字"
             value={entity.label?.text ?? ''}
             onChange={(e) => {
               const text = e.target.value
@@ -783,13 +780,13 @@ function EntityInspector({
 
       {mode === 'shoot' && (
         <div className="panel-section">
-          <div className="panel-title">Blocking</div>
+          <div className="panel-title">走位</div>
           <button
             className="btn"
             style={{ width: '100%', marginBottom: 8 }}
             onClick={() => setDroppingMarks(true)}
           >
-            Drop marks (M)
+            放置标记 (M)
           </button>
           {marks.map((m, i) => (
             <div
@@ -797,7 +794,7 @@ function EntityInspector({
               className="mark-row"
               onClick={() => setSelection({ kind: 'mark', entityId, markId: m.id })}
             >
-              Mark {i + 1} — {m.time.toFixed(1)}s — {(m as ActorMark).gait}
+              标记 {i + 1} — {m.time.toFixed(1)}s — {zh(GAITS[(m as ActorMark).gait].name)}
             </div>
           ))}
         </div>
@@ -810,7 +807,7 @@ function EntityInspector({
       {mode === 'shoot' && <ActionPresetsSection scene={scene} shot={shot} entity={entity} />}
 
       <div className="panel-section">
-        <div className="panel-title">Danger zone</div>
+        <div className="panel-title">删除操作</div>
         <button
           className="btn danger"
           style={{ width: '100%' }}
@@ -831,7 +828,7 @@ function EntityInspector({
             setSelection(null)
           }}
         >
-          Delete entity
+          删除对象
         </button>
       </div>
     </div>
@@ -841,12 +838,12 @@ function EntityInspector({
 /* ------------------------- motion presets ------------------------------ */
 
 const MOTION_CATEGORIES: { key: MotionPreset['category']; label: string }[] = [
-  { key: 'fight', label: 'Fight' },
-  { key: 'dance', label: 'Dance' },
-  { key: 'gesture', label: 'Gesture' },
-  { key: 'everyday', label: 'Everyday' },
-  { key: 'sport', label: 'Sport' },
-  { key: 'stunt', label: 'Stunt' }
+  { key: 'fight', label: '打斗' },
+  { key: 'dance', label: '舞蹈' },
+  { key: 'gesture', label: '手势' },
+  { key: 'everyday', label: '日常' },
+  { key: 'sport', label: '运动' },
+  { key: 'stunt', label: '特技' }
 ]
 
 /**
@@ -914,18 +911,18 @@ function MotionPresetsSection({
     })
     if (added > 0) {
       toast(
-        `${preset.name} from ${time.toFixed(1)}s (${added} poses${added < preset.keyframes.length ? ' — extend the shot for the rest' : ''}). Press ▶ to watch.`,
+        `${zh(preset.name)}，从 ${time.toFixed(1)}s 开始（${added} 个姿态${added < preset.keyframes.length ? '，延长镜头可播放完整动作' : ''}）。按 ▶ 预览。`,
         'success'
       )
     } else {
-      toast('No room before the end of the shot — move the playhead earlier.', 'info')
+      toast('镜头剩余时长不足，请将播放头前移。', 'info')
     }
   }
 
   const items = MOTION_PRESETS.filter((p) => p.category === category)
   return (
     <div className="panel-section">
-      <div className="panel-title">Motion presets</div>
+      <div className="panel-title">动作预设</div>
       <div className="seg" style={{ marginBottom: 8 }}>
         {MOTION_CATEGORIES.map((c) => (
           <button
@@ -940,15 +937,15 @@ function MotionPresetsSection({
       {items.map((p) => (
         <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
           <span style={{ flex: 1, fontSize: 12 }}>
-            {p.name}
+            {zh(p.name)}
             <span style={{ opacity: 0.55 }}> · {p.duration.toFixed(1)}s</span>
           </span>
           <button
             className="btn small"
             onClick={() => apply(p)}
-            title={`Insert the ${p.name} move at the playhead as editable pose marks`}
+            title={`在播放头处插入“${zh(p.name)}”，生成可编辑的姿态标记`}
           >
-            Apply
+            应用
           </button>
         </div>
       ))}
@@ -984,7 +981,7 @@ function ActionPresetsSection({
     if (!preset) return
     const remaining = shot.duration - time
     if (remaining < 1) {
-      toast('Not enough shot left after the playhead — move it earlier.', 'info')
+      toast('播放头之后的镜头时长不足，请将播放头前移。', 'info')
       return
     }
     // Pose at the playhead: the path starts where the entity IS.
@@ -1023,20 +1020,20 @@ function ActionPresetsSection({
         })
       }
     })
-    toast(`${preset.name} from ${time.toFixed(1)}s — ▶ to watch. Every mark stays editable.`, 'success')
+    toast(`${zh(preset.name)}，从 ${time.toFixed(1)}s 开始。按 ▶ 预览，每个标记均可编辑。`, 'success')
   }
 
   return (
     <div className="panel-section">
-      <div className="panel-title">Action presets</div>
+      <div className="panel-title">路径预设</div>
       <div className="field">
-        <label>Flight, drive & stunt paths — starts at the playhead</label>
+        <label>飞行、驾驶与特技路径，从播放头位置开始</label>
         <select value={presetId} onChange={(e) => setPresetId(e.target.value)}>
           {categories.map((cat) => (
-            <optgroup key={cat} label={cat.toUpperCase()}>
+            <optgroup key={cat} label={zh(cat)}>
               {ACTION_PRESETS.filter((p) => p.category === cat).map((p) => (
                 <option key={p.id} value={p.id}>
-                  {p.name}
+                  {zh(p.name)}
                 </option>
               ))}
             </optgroup>
@@ -1045,11 +1042,11 @@ function ActionPresetsSection({
       </div>
       {preset && (
         <p style={{ color: 'var(--text-faint)', fontSize: 11, lineHeight: 1.4, marginBottom: 8 }}>
-          {preset.description}
+          {zh(preset.description)}
         </p>
       )}
       <button className="btn primary" style={{ width: '100%' }} onClick={apply}>
-        Apply action
+        应用路径
       </button>
     </div>
   )
@@ -1068,26 +1065,26 @@ function MarriageSection({ scene, entity }: { scene: Scene; entity: Entity }): J
 
   return (
     <div className="panel-section">
-      <div className="panel-title">Marriage</div>
+      <div className="panel-title">跟随绑定</div>
       {entity.attachedTo ? (
         <>
           <p style={{ color: 'var(--text-dim)', fontSize: 12, marginBottom: 4 }}>
-            Married to {parentName}
+            已绑定到 {parentName}
           </p>
           <p style={{ color: 'var(--text-faint)', fontSize: 11, lineHeight: 1.4, marginBottom: 8 }}>
-            Follows it everywhere. Drag this entity to adjust its riding offset.
+            此对象会跟随绑定目标移动。拖动此对象可调整其相对位置。
           </p>
           <button
             className="btn"
             style={{ width: '100%' }}
             onClick={() => unmarryEntities([entity.id])}
           >
-            Unmarry
+            解除绑定
           </button>
         </>
       ) : (
         <div className="field">
-          <label>Marry to…</label>
+          <label>绑定到…</label>
           <select
             value=""
             onChange={(e) => {
@@ -1095,7 +1092,7 @@ function MarriageSection({ scene, entity }: { scene: Scene; entity: Entity }): J
               if (id) marryEntities([entity.id], id)
             }}
           >
-            <option value="">— choose an anchor —</option>
+            <option value="">— 选择跟随目标 —</option>
             {scene.entities
               .filter((e) => e.id !== entity.id)
               .map((e) => (
@@ -1135,7 +1132,7 @@ function MultiEntityInspector({
   return (
     <div>
       <div className="panel-section">
-        <div className="panel-title">{entities.length} selected</div>
+        <div className="panel-title">{entities.length} 个对象已选中</div>
         {entities.map((e) => (
           <div key={e.id} style={{ color: 'var(--text-dim)', fontSize: 11, padding: '2px 0' }}>
             {e.label?.text || e.name}
@@ -1145,16 +1142,16 @@ function MultiEntityInspector({
 
       {entities.length >= 2 && (
         <div className="panel-section">
-          <div className="panel-title">Marry</div>
+          <div className="panel-title">绑定</div>
           <p style={{ color: 'var(--text-faint)', fontSize: 11, lineHeight: 1.4, marginBottom: 8 }}>
-            The LAST selected is the anchor — the others will follow it.
+            最后选中的对象作为跟随目标，其余对象会跟随它移动。
           </p>
           <button
             className="btn primary"
             style={{ width: '100%', marginBottom: anyMarried ? 8 : 0 }}
             onClick={() => marryEntities(entityIds.slice(0, -1), entityIds[entityIds.length - 1]!)}
           >
-            Marry to {anchorName}
+            绑定到 {anchorName}
           </button>
           {anyMarried && (
             <button
@@ -1162,14 +1159,14 @@ function MultiEntityInspector({
               style={{ width: '100%' }}
               onClick={() => unmarryEntities(entityIds)}
             >
-              Unmarry selected
+              解除所选对象的绑定
             </button>
           )}
         </div>
       )}
 
       <div className="panel-section">
-        <div className="panel-title">Danger zone</div>
+        <div className="panel-title">删除操作</div>
         <button
           className="btn danger"
           style={{ width: '100%' }}
@@ -1209,7 +1206,7 @@ function MultiEntityInspector({
             setSelection(null)
           }}
         >
-          Delete {entities.length} entities
+          删除 {entities.length} 个对象
         </button>
       </div>
     </div>
@@ -1256,14 +1253,14 @@ function MultiMarkInspector({
   return (
     <div>
       <div className="panel-section">
-        <div className="panel-title">{markIds.length} marks selected</div>
+        <div className="panel-title">{markIds.length} 个标记已选中</div>
       </div>
 
       <div className="panel-section">
-        <div className="panel-title">Shift times</div>
+        <div className="panel-title">整体调整时间</div>
         <div className="field-row">
           <div className="field" style={{ flex: 1 }}>
-            <label>Offset (s)</label>
+            <label>时间偏移 (s)</label>
             <input
               type="number"
               step={0.1}
@@ -1287,7 +1284,7 @@ function MultiMarkInspector({
               })
             }}
           >
-            Apply
+            应用
           </button>
         </div>
       </div>
@@ -1298,7 +1295,7 @@ function MultiMarkInspector({
           style={{ width: '100%' }}
           onClick={() => useStore.getState().deleteSelectedMarks()}
         >
-          Delete {markIds.length} marks
+          删除 {markIds.length} 个标记
         </button>
       </div>
     </div>
@@ -1333,16 +1330,16 @@ function CameraPoseSection({ scene, shot }: { scene: Scene; shot: Shot }): JSX.E
   if (!active) {
     return (
       <div className="panel-section">
-        <div className="panel-title">Position &amp; aim</div>
+        <div className="panel-title">位置与朝向</div>
         <p style={{ color: 'var(--text-faint)', fontSize: 11, lineHeight: 1.4, marginBottom: 8 }}>
-          No camera marks yet — drop one and these fields control it directly.
+          尚无摄影机标记。先添加一个，即可用这些字段直接调整。
         </p>
         <button
           className="btn"
           style={{ width: '100%' }}
           onClick={() => emit('dropCameraMarkAtView', {})}
         >
-          + Drop camera mark at current view
+          + 将当前视图设为摄影机标记
         </button>
       </div>
     )
@@ -1357,7 +1354,7 @@ function CameraPoseSection({ scene, shot }: { scene: Scene; shot: Shot }): JSX.E
   ): JSX.Element => (
     <div className="field" style={{ flex: 1 }}>
       <label>
-        {label}
+        {zh(label)}
         {unit ? ` (${unit})` : ''}
       </label>
       <input
@@ -1376,7 +1373,7 @@ function CameraPoseSection({ scene, shot }: { scene: Scene; shot: Shot }): JSX.E
   return (
     <div className="panel-section">
       <div className="panel-title">
-        Position &amp; aim — mark {markIndex}/{ordered.length}
+        位置与朝向 — 标记 {markIndex}/{ordered.length}
       </div>
       <div className="field-row">
         {numField('X', active.position.x, 0.1, (m, v) => (m.position.x = v))}
@@ -1393,7 +1390,7 @@ function CameraPoseSection({ scene, shot }: { scene: Scene; shot: Shot }): JSX.E
         {numField('At time', active.time, 0.1, (m, v) => (m.time = clamp(v, 0, shot.duration)), 's')}
       </div>
       <p style={{ color: 'var(--text-faint)', fontSize: 11, lineHeight: 1.4 }}>
-        Edits the mark at/before the playhead — scrub the timeline to reach a different mark.
+        编辑播放头当前或之前的最近标记。拖动时间线播放头可切换到其他标记。
       </p>
     </div>
   )
@@ -1420,18 +1417,18 @@ function CameraMovesSection({ scene }: { scene: Scene }): JSX.Element {
 
   return (
     <div className="panel-section">
-      <div className="panel-title">Camera moves</div>
+      <div className="panel-title">运镜预设</div>
       <div className="field">
         <label>
-          {CAMERA_MOVE_PRESETS.length} classic moves — built around{' '}
-          {subjectHint ? subjectHint.label?.text || subjectHint.name : 'your subject'}
+          {CAMERA_MOVE_PRESETS.length} 种经典运镜，围绕{' '}
+          {subjectHint ? subjectHint.label?.text || subjectHint.name : '主体'}
         </label>
         <select value={presetId} onChange={(e) => setPresetId(e.target.value)}>
           {categories.map((cat) => (
-            <optgroup key={cat} label={cat.toUpperCase()}>
+            <optgroup key={cat} label={zh(cat)}>
               {CAMERA_MOVE_PRESETS.filter((p) => p.category === cat).map((p) => (
                 <option key={p.id} value={p.id}>
-                  {p.name}
+                  {zh(p.name)}
                 </option>
               ))}
             </optgroup>
@@ -1440,17 +1437,17 @@ function CameraMovesSection({ scene }: { scene: Scene }): JSX.Element {
       </div>
       {preset && (
         <p style={{ color: 'var(--text-faint)', fontSize: 11, lineHeight: 1.4, marginBottom: 8 }}>
-          {preset.description}
-          {preset.track ? ' Aim-locks onto the subject.' : ''}
+          {zh(preset.description)}
+          {preset.track ? ' 摄影机朝向将锁定主体。' : ''}
         </p>
       )}
       <button
         className="btn primary"
         style={{ width: '100%' }}
         onClick={() => getSceneManager()?.applyCameraMove(presetId)}
-        title="Replaces this camera's marks with the move (one undo step). Select an entity first to build the move around it; otherwise the first character is used."
+        title="用此运镜替换当前摄影机的标记，一次撤销即可还原。先选择对象可围绕它构建运镜，否则使用第一名角色。"
       >
-        Apply move
+        应用运镜
       </button>
     </div>
   )
@@ -1483,7 +1480,7 @@ function CameraInspector({ scene, shot }: { scene: Scene; shot: Shot }): JSX.Ele
   return (
     <div>
       <div className="panel-section">
-        <div className="panel-title">Cameras (A/B/C)</div>
+        <div className="panel-title">摄影机 (A/B/C)</div>
         <div className="seg">
           <button
             className="active"
@@ -1496,16 +1493,16 @@ function CameraInspector({ scene, shot }: { scene: Scene; shot: Shot }): JSX.Ele
               {b.name}
             </button>
           ))}
-          <button onClick={() => addCameraToShot()} title="Add a camera">
+          <button onClick={() => addCameraToShot()} title="添加摄影机">
             +
           </button>
         </div>
       </div>
 
       <div className="panel-section">
-        <div className="panel-title">Camera</div>
+        <div className="panel-title">摄影机</div>
         <div className="field">
-          <label>Sensor</label>
+          <label>传感器</label>
           <select
             value={cam.sensorId}
             onChange={(e) => {
@@ -1515,13 +1512,13 @@ function CameraInspector({ scene, shot }: { scene: Scene; shot: Shot }): JSX.Ele
           >
             {Object.values(SENSORS).map((s) => (
               <option key={s.id} value={s.id}>
-                {s.name}
+                {zh(s.name)}
               </option>
             ))}
           </select>
         </div>
         <div className="field">
-          <label>Lens</label>
+          <label>焦距</label>
           <div className="seg">
             {LENS_SET.map((fl) => (
               <button
@@ -1535,10 +1532,14 @@ function CameraInspector({ scene, shot }: { scene: Scene; shot: Shot }): JSX.Ele
           </div>
         </div>
         <div className="field">
-          <label>Auto-frame subject</label>
+          <label>自动构图</label>
           <div className="seg">
             {SHOT_SIZE_BTNS.map((sz) => (
-              <button key={sz} onClick={() => emit('frameSubject', { size: sz })}>
+              <button
+                key={sz}
+                title={zh(SHOT_SIZES[sz].name)}
+                onClick={() => emit('frameSubject', { size: sz })}
+              >
                 {sz}
               </button>
             ))}
@@ -1549,9 +1550,9 @@ function CameraInspector({ scene, shot }: { scene: Scene; shot: Shot }): JSX.Ele
       <CameraPoseSection scene={scene} shot={shot} />
 
       <div className="panel-section">
-        <div className="panel-title">Track subject</div>
+        <div className="panel-title">跟踪主体</div>
         <div className="field">
-          <label>Keep the camera aimed at…</label>
+          <label>使摄影机始终朝向…</label>
           <select
             value={cam.trackEntityId ?? ''}
             onChange={(e) =>
@@ -1560,9 +1561,9 @@ function CameraInspector({ scene, shot }: { scene: Scene; shot: Shot }): JSX.Ele
                 else delete c.trackEntityId
               })
             }
-            title="Aim lock: no matter how the camera position moves — marks, a recorded flight, a preset — it stays pointed at this subject. Drone tracking a plane, operator following an actor."
+            title="锁定朝向：无论通过标记、录制飞行还是预设移动摄影机，它都会始终朝向主体。可用于无人机跟拍飞机或摄影师跟拍演员。"
           >
-            <option value="">— aim by marks (off) —</option>
+            <option value="">— 按标记朝向（关闭跟踪）—</option>
             {scene.entities.map((e) => (
               <option key={e.id} value={e.id}>
                 {e.label?.text || e.name}
@@ -1572,9 +1573,7 @@ function CameraInspector({ scene, shot }: { scene: Scene; shot: Shot }): JSX.Ele
         </div>
         {cam.trackEntityId && (
           <p style={{ color: 'var(--text-faint)', fontSize: 11, lineHeight: 1.4 }}>
-            Tracking on: move the camera any way you like — drop marks, record a flight, apply a
-            move preset — the lens stays glued to the subject. Focus follows it too when a mark
-            sets a focus distance.
+            跟踪已开启：放置标记、录制飞行或应用运镜预设时，摄影机都会始终朝向主体。如果标记设置了对焦距离，焦点也会跟随主体。
           </p>
         )}
       </div>
@@ -1582,7 +1581,7 @@ function CameraInspector({ scene, shot }: { scene: Scene; shot: Shot }): JSX.Ele
       <CameraMovesSection scene={scene} />
 
       <div className="panel-section">
-        <div className="panel-title">Rig</div>
+        <div className="panel-title">摄影机支撑方式</div>
         <div className="seg" style={{ marginBottom: 10 }}>
           {(Object.keys(RIGS) as RigId[]).map((id) => (
             <button
@@ -1590,16 +1589,16 @@ function CameraInspector({ scene, shot }: { scene: Scene; shot: Shot }): JSX.Ele
               className={cam.rig === id ? 'active' : ''}
               onClick={() => editCam('rig', (c) => (c.rig = id))}
             >
-              {RIGS[id].name}
+              {zh(RIGS[id].name)}
             </button>
           ))}
         </div>
         <p style={{ color: 'var(--text-faint)', fontSize: 11, marginBottom: 10 }}>
-          {rigSpec.description}
+          {zh(rigSpec.description)}
         </p>
         {(cam.rig === 'handheld' || cam.rig === 'steadicam') && (
           <div className="field">
-            <label>Intensity ({cam.rigIntensity.toFixed(2)})</label>
+            <label>强度 ({cam.rigIntensity.toFixed(2)})</label>
             <input
               type="range"
               min={0}
@@ -1615,7 +1614,7 @@ function CameraInspector({ scene, shot }: { scene: Scene; shot: Shot }): JSX.Ele
         )}
         {cam.rig === 'carMount' && (
           <div className="field">
-            <label>Mount to</label>
+            <label>安装到</label>
             <select
               value={cam.mountEntityId ?? ''}
               onChange={(e) => {
@@ -1623,7 +1622,7 @@ function CameraInspector({ scene, shot }: { scene: Scene; shot: Shot }): JSX.Ele
                 editCam('mount entity', (c) => (c.mountEntityId = id))
               }}
             >
-              <option value="">— none —</option>
+              <option value="">— 无 —</option>
               {scene.entities.map((en) => (
                 <option key={en.id} value={en.id}>
                   {en.label?.text || en.name}
@@ -1635,13 +1634,13 @@ function CameraInspector({ scene, shot }: { scene: Scene; shot: Shot }): JSX.Ele
       </div>
 
       <div className="panel-section">
-        <div className="panel-title">Marks</div>
+        <div className="panel-title">标记</div>
         <button
           className="btn primary"
           style={{ width: '100%', marginBottom: 8 }}
           onClick={() => emit('dropCameraMarkAtView', {})}
         >
-          Drop camera mark at view (or M)
+          将当前视图设为摄影机标记 (M)
         </button>
         {orderedMarks.map((m, i) => (
           <div
@@ -1649,7 +1648,7 @@ function CameraInspector({ scene, shot }: { scene: Scene; shot: Shot }): JSX.Ele
             className="mark-row"
             onClick={() => setSelection({ kind: 'mark', entityId: 'camera', markId: m.id })}
           >
-            Mark {i + 1} — {m.time.toFixed(1)}s — {m.focalLength}mm
+            标记 {i + 1} — {m.time.toFixed(1)}s — {m.focalLength}mm
           </div>
         ))}
         {orderedMarks.length > 0 && (
@@ -1658,7 +1657,7 @@ function CameraInspector({ scene, shot }: { scene: Scene; shot: Shot }): JSX.Ele
             style={{ width: '100%', marginTop: 8 }}
             onClick={() => clearCameraMarks()}
           >
-            Clear camera move (delete all marks)
+            清除运镜（删除全部标记）
           </button>
         )}
       </div>
@@ -1689,7 +1688,7 @@ function MarkInspector({
   const ordered = [...list].sort((a, b) => a.time - b.time)
   const mark = list.find((m) => m.id === markId)
 
-  if (!mark) return <div className="panel-section">Mark not found.</div>
+  if (!mark) return <div className="panel-section">未找到标记。</div>
 
   const index = ordered.findIndex((m) => m.id === markId) + 1
   const actorMark = isCamera ? null : (mark as ActorMark)
@@ -1715,10 +1714,10 @@ function MarkInspector({
   return (
     <div>
       <div className="panel-section">
-        <div className="panel-title">Mark {index}</div>
+        <div className="panel-title">标记 {index}</div>
         <div className="field-row">
           <div className="field" style={{ flex: 1 }}>
-            <label>Arrive (s)</label>
+            <label>到达时间 (s)</label>
             <input
               type="number"
               min={0}
@@ -1732,7 +1731,7 @@ function MarkInspector({
             />
           </div>
           <div className="field" style={{ flex: 1 }}>
-            <label>Hold (s)</label>
+            <label>停留时间 (s)</label>
             <input
               type="number"
               min={0}
@@ -1747,7 +1746,7 @@ function MarkInspector({
           </div>
         </div>
         <div className="field">
-          <label>Ease out ({mark.easeOut.toFixed(2)})</label>
+          <label>缓出 ({mark.easeOut.toFixed(2)})</label>
           <input
             type="range"
             min={0}
@@ -1761,7 +1760,7 @@ function MarkInspector({
           />
         </div>
         <div className="field">
-          <label>Ease in ({mark.easeIn.toFixed(2)})</label>
+          <label>缓入 ({mark.easeIn.toFixed(2)})</label>
           <input
             type="range"
             min={0}
@@ -1778,7 +1777,7 @@ function MarkInspector({
 
       {actorMark && (
         <div className="panel-section">
-          <div className="panel-title">Gait</div>
+          <div className="panel-title">步态</div>
           <div className="seg gait-grid">
             {(Object.keys(GAITS) as GaitId[]).map((g) => (
               <button
@@ -1786,12 +1785,12 @@ function MarkInspector({
                 className={actorMark.gait === g ? 'active' : ''}
                 onClick={() => editMark('gait', (m) => ((m as ActorMark).gait = g))}
               >
-                {g}
+                {zh(GAITS[g].name)}
               </button>
             ))}
           </div>
           <div className="field" style={{ marginTop: 8 }}>
-            <label>Altitude (m) — 0 is the ground; raise it to fly</label>
+            <label>高度 (m)，0 为地面；升高可飞行</label>
             <input
               type="number"
               min={0}
@@ -1809,9 +1808,9 @@ function MarkInspector({
 
       {actorMark && (
         <div className="panel-section">
-          <div className="panel-title">Board on arrival</div>
+          <div className="panel-title">到达后搭乘</div>
           <div className="field">
-            <label>After reaching this mark, ride…</label>
+            <label>到达此标记后搭乘…</label>
             <select
               value={actorMark.attachTo ?? ''}
               onChange={(e) =>
@@ -1819,9 +1818,9 @@ function MarkInspector({
                   (m as ActorMark).attachTo = e.target.value || undefined
                 })
               }
-              title="Boarding: walk to this mark, then attach to a vehicle/prop and move with it — step onto a bus and ride away"
+              title="搭乘：走到此标记后，绑定到车辆或道具并随其移动，例如上车后随车离开"
             >
-              <option value="">— stay on foot —</option>
+              <option value="">— 保持步行 —</option>
               {scene.entities
                 .filter((e) => e.id !== entityId)
                 .map((e) => (
@@ -1838,9 +1837,9 @@ function MarkInspector({
 
       {cameraMark && (
         <div className="panel-section">
-          <div className="panel-title">Optics</div>
+          <div className="panel-title">光学</div>
           <div className="field">
-            <label>Focal length (mm)</label>
+            <label>焦距 (mm)</label>
             <input
               type="number"
               min={8}
@@ -1867,12 +1866,12 @@ function MarkInspector({
                 }}
                 style={{ width: 'auto', marginRight: 6 }}
               />
-              ∞ deep focus
+              ∞ 大景深
             </label>
           </div>
           {cameraMark.focusDistance !== undefined && (
             <div className="field">
-              <label>Focus distance (m)</label>
+              <label>对焦距离 (m)</label>
               <input
                 type="number"
                 min={0.3}
@@ -1891,7 +1890,7 @@ function MarkInspector({
       )}
 
       <div className="panel-section">
-        <div className="panel-title">Position</div>
+        <div className="panel-title">位置</div>
         <div className="field-row">
           <div className="field" style={{ flex: 1 }}>
             <label>X</label>
@@ -1940,7 +1939,7 @@ function MarkInspector({
             setSelection(null)
           }}
         >
-          Delete mark
+          删除标记
         </button>
       </div>
     </div>
@@ -1950,33 +1949,33 @@ function MarkInspector({
 /* ------------------------------- pose ----------------------------------- */
 
 const POSES: { id: GaitId; label: string }[] = [
-  { id: 'stand', label: 'Stand' },
-  { id: 'sit', label: 'Sit' },
-  { id: 'crouch', label: 'Crouch' },
-  { id: 'lie', label: 'Lie' },
-  { id: 'gesture', label: 'Talk' },
-  { id: 'fall', label: 'Fallen' }
+  { id: 'stand', label: '站立' },
+  { id: 'sit', label: '坐下' },
+  { id: 'crouch', label: '蹲下' },
+  { id: 'lie', label: '躺下' },
+  { id: 'gesture', label: '交流' },
+  { id: 'fall', label: '倒地' }
 ]
 
 const JOINTS: { key: string; label: string; range: number }[] = [
-  { key: 'shoulderLX', label: 'L arm fwd', range: 180 },
-  { key: 'shoulderRX', label: 'R arm fwd', range: 180 },
-  { key: 'shoulderLZ', label: 'L arm out', range: 150 },
-  { key: 'shoulderRZ', label: 'R arm out', range: 150 },
-  { key: 'elbowL', label: 'L elbow', range: 150 },
-  { key: 'elbowR', label: 'R elbow', range: 150 },
-  { key: 'hipLX', label: 'L leg', range: 120 },
-  { key: 'hipRX', label: 'R leg', range: 120 },
-  { key: 'hipLZ', label: 'L leg out', range: 90 },
-  { key: 'hipRZ', label: 'R leg out', range: 90 },
-  { key: 'kneeL', label: 'L knee', range: 150 },
-  { key: 'kneeR', label: 'R knee', range: 150 },
-  { key: 'torsoX', label: 'Torso lean', range: 60 },
-  { key: 'torsoY', label: 'Torso twist', range: 80 },
-  { key: 'torsoZ', label: 'Torso tilt', range: 50 },
-  { key: 'headY', label: 'Head turn', range: 80 },
-  { key: 'headX', label: 'Head nod', range: 45 },
-  { key: 'headZ', label: 'Head tilt', range: 45 }
+  { key: 'shoulderLX', label: '左臂前摆', range: 180 },
+  { key: 'shoulderRX', label: '右臂前摆', range: 180 },
+  { key: 'shoulderLZ', label: '左臂外展', range: 150 },
+  { key: 'shoulderRZ', label: '右臂外展', range: 150 },
+  { key: 'elbowL', label: '左肘', range: 150 },
+  { key: 'elbowR', label: '右肘', range: 150 },
+  { key: 'hipLX', label: '左腿前摆', range: 120 },
+  { key: 'hipRX', label: '右腿前摆', range: 120 },
+  { key: 'hipLZ', label: '左腿外展', range: 90 },
+  { key: 'hipRZ', label: '右腿外展', range: 90 },
+  { key: 'kneeL', label: '左膝', range: 150 },
+  { key: 'kneeR', label: '右膝', range: 150 },
+  { key: 'torsoX', label: '躯干前倾', range: 60 },
+  { key: 'torsoY', label: '躯干扭转', range: 80 },
+  { key: 'torsoZ', label: '躯干侧倾', range: 50 },
+  { key: 'headY', label: '头部转向', range: 80 },
+  { key: 'headX', label: '头部俯仰', range: 45 },
+  { key: 'headZ', label: '头部侧倾', range: 45 }
 ]
 
 const DEG = 180 / Math.PI
@@ -1995,7 +1994,7 @@ function PoseSection({
 
   return (
     <div className="panel-section">
-      <div className="panel-title">Pose</div>
+      <div className="panel-title">姿态</div>
       <div className="seg gait-grid" style={{ marginBottom: 10 }}>
         {POSES.map((p) => (
           <button
@@ -2012,13 +2011,13 @@ function PoseSection({
         ))}
       </div>
       <p style={{ color: 'var(--text-faint)', fontSize: 11, lineHeight: 1.4, marginBottom: 8 }}>
-        The pose applies while the actor has no marks; marks override it with their own gait.
+        角色没有标记时使用此姿态；存在标记时，使用标记各自设置的步态。
       </p>
       <details open={hasOverrides}>
         <summary
           style={{ cursor: 'pointer', fontSize: 11, fontWeight: 600, color: 'var(--text-dim)', marginBottom: 8 }}
         >
-          Pose limbs (fight / dance blocking)
+          肢体姿态（打斗 / 舞蹈走位）
         </summary>
         {JOINTS.map((j) => {
           const raw = entity.params?.[`joint_${j.key}`]
@@ -2058,7 +2057,7 @@ function PoseSection({
             })
           }
         >
-          Reset limbs
+          重置肢体
         </button>
       </details>
     </div>
@@ -2081,16 +2080,15 @@ function MarkPoseSection({
 
   return (
     <div className="panel-section">
-      <div className="panel-title">Pose at this mark</div>
+      <div className="panel-title">此标记处的姿态</div>
       <p style={{ color: 'var(--text-faint)', fontSize: 11, lineHeight: 1.4, marginBottom: 8 }}>
-        Limbs blend from the previous mark's pose to this one while travelling — set different
-        poses on successive marks to choreograph a move.
+        移动过程中，肢体从上一标记的姿态过渡到此姿态。为连续标记设置不同姿态，即可编排动作。
       </p>
       <details open={hasPose}>
         <summary
           style={{ cursor: 'pointer', fontSize: 11, fontWeight: 600, color: 'var(--text-dim)', marginBottom: 8 }}
         >
-          Joint keyframes
+          关节关键帧
         </summary>
         {JOINTS.map((j) => {
           const rad = mark.joints?.[j.key] ?? 0
@@ -2127,7 +2125,7 @@ function MarkPoseSection({
             })
           }
         >
-          Reset pose at this mark
+          重置此标记的姿态
         </button>
       </details>
     </div>

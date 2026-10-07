@@ -43,7 +43,7 @@ test('app boots to the welcome screen', async () => {
 })
 
 test('creates a project and stages a scene through real UI actions', async () => {
-  await page.getByRole('button', { name: 'New Project' }).click()
+  await page.getByRole('button', { name: '新建项目' }).click()
   // First project creation initializes the full GL scene; CI's GPU-less Intel runners need well over the default 5s.
   await expect(page.locator('.mode-switch')).toBeVisible({ timeout: 30_000 })
 
@@ -90,7 +90,7 @@ test('choreographs marks, labels, and camera; project round-trips to disk', asyn
   })
 
   // Save via the titlebar button and verify project.json exists and parses.
-  await page.getByRole('button', { name: 'Save', exact: true }).click()
+  await page.getByRole('button', { name: '保存', exact: true }).click()
   await page.waitForTimeout(300)
   const projPath = join(smokeDir, 'Smoke.blockout', 'project.json')
   expect(existsSync(projPath)).toBe(true)

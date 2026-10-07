@@ -15,11 +15,11 @@ test.beforeAll(async () => {
   const dir = mkdtempSync(join(tmpdir(), 'blockout-v4-'))
   app = await electron.launch({
     args: ['out/main/index.js'],
-    env: { ...process.env, BLOCKOUT_SMOKE_DIR: dir }
+    env: { ...process.env, BLOCKOUT_SMOKE_DIR: dir, BLOCKOUT_CONFIG_DIR: join(dir, 'config') }
   })
   page = await app.firstWindow()
   await page.waitForLoadState('domcontentloaded')
-  await page.getByRole('button', { name: 'New Project' }).click()
+  await page.getByRole('button', { name: '新建项目' }).click()
   await page.waitForTimeout(400)
 })
 
@@ -29,10 +29,10 @@ test.afterAll(async () => {
 
 test('sequence click-to-place stages the crowd AT the clicked spot', async () => {
   // Arm placement through the real UI, then click the center of the floor.
-  const seqBox = page.locator('.panel-section', { hasText: 'Sequences' }).first()
+  const seqBox = page.locator('.panel-section', { hasText: '群体动作' }).first()
   await seqBox.locator('input[type="number"]').fill('6')
-  await page.getByRole('button', { name: /Stage 6 performers/ }).click()
-  await expect(page.getByRole('button', { name: /Click the floor to place/ })).toBeVisible()
+  await page.getByRole('button', { name: /布置 6 位表演者/ }).click()
+  await expect(page.getByRole('button', { name: /点击地面放置/ })).toBeVisible()
 
   const canvas = page.locator('.viewport-wrap canvas')
   const box = (await canvas.boundingBox())!
@@ -125,12 +125,12 @@ test('dragging a performer moves its choreography (marks ride along)', async () 
 })
 
 test('✨ Animate tab: single character and empty-selection guidance', async () => {
-  await page.getByRole('button', { name: '✨ Animate' }).click()
-  await expect(page.getByText('Animating:')).toBeVisible() // dancer still selected
-  await expect(page.getByText('Motion presets')).toBeVisible()
-  await expect(page.getByText('Action presets')).toBeVisible()
+  await page.getByRole('button', { name: '✨ 动作' }).click()
+  await expect(page.getByText('动作对象：')).toBeVisible() // dancer still selected
+  await expect(page.getByText('动作预设')).toBeVisible()
+  await expect(page.getByText('路径预设')).toBeVisible()
   await page.evaluate(() => (window as any).__blockout.store.getState().setSelection(null))
-  await expect(page.getByText(/Select a character/)).toBeVisible()
+  await expect(page.getByText(/选择一名/)).toBeVisible()
 })
 
 test('group restyle: swap every dancer to one style in a click', async () => {

@@ -22,7 +22,7 @@ test.beforeAll(async () => {
   })
   page = await app.firstWindow()
   await page.waitForLoadState('domcontentloaded')
-  await page.getByRole('button', { name: 'New Project' }).click()
+  await page.getByRole('button', { name: '新建项目' }).click()
   await page.waitForTimeout(400)
 })
 
@@ -150,7 +150,7 @@ test('record control setting cycles and persists in the store', async () => {
     return out
   })
   expect(modes).toEqual(['normal', 'precise', 'fast'])
-  await expect(page.getByRole('button', { name: '⚡ Fast' })).toBeVisible()
+  await expect(page.getByRole('button', { name: '⚡ 快速' })).toBeVisible()
 })
 
 test('MCP surface: list_camera_moves, apply_camera_move, set_track_subject', async () => {

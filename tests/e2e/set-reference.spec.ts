@@ -91,7 +91,7 @@ test.afterAll(async () => {
 
 test('set_reference control action attaches a reference and copies the clip into refs/', async () => {
   // Create a project so there is a projectFolder + an active shot.
-  await page.getByRole('button', { name: 'New Project' }).click()
+  await page.getByRole('button', { name: '新建项目' }).click()
   // First project creation initializes the full GL scene; CI's GPU-less Intel runners need well over the default 5s.
   await expect(page.locator('.mode-switch')).toBeVisible({ timeout: 30_000 })
 

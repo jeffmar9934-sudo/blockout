@@ -9,6 +9,7 @@
 import { useMemo, useRef, useState } from 'react'
 import type { PointerEvent as ReactPointerEvent } from 'react'
 import { useStore } from '../store'
+import { zh } from '../i18n/zh-CN'
 import { ShotEvaluator } from '@engine/evaluate'
 import { GAITS } from '@engine/gaits'
 import type { ActorMark, CameraMark, MarkBase, Scene, Shot } from '@engine/types'
@@ -17,9 +18,9 @@ const clamp = (v: number, lo: number, hi: number): number => Math.min(Math.max(v
 
 /** Human-readable label for a speed-warning suggestion. */
 function suggestionLabel(suggestion: string): string {
-  if (suggestion === 'addTime') return 'more time'
+  if (suggestion === 'addTime') return '延长时间'
   const g = GAITS[suggestion as keyof typeof GAITS]
-  return g ? g.name.toLowerCase() : suggestion
+  return g ? zh(g.name) : zh(suggestion)
 }
 
 interface TimelineLane {
@@ -87,7 +88,7 @@ export function Timeline(): JSX.Element {
   const laneLabelProps = (entityId: string | 'camera'): React.HTMLAttributes<HTMLSpanElement> => ({
     onClick: () => selectAllMarksInLane(entityId),
     style: { cursor: 'pointer' },
-    title: 'Click: select ALL marks in this lane (⌫ deletes them together)'
+    title: '点击选择此轨道的全部走位点（按 ⌫ 一起删除）'
   })
 
   const lanes: TimelineLane[] = []
@@ -96,7 +97,7 @@ export function Timeline(): JSX.Element {
     entityId: 'camera',
     label: (
       <span className="timeline-track-label" {...laneLabelProps('camera')}>
-        🎥 CAMERA
+        🎥 摄影机
       </span>
     ),
     marks: shot.camera.marks
@@ -256,17 +257,17 @@ export function Timeline(): JSX.Element {
       <div
         className="timeline-resizer"
         onPointerDown={onResizeStart}
-        title="Drag to resize the timeline"
+        title="拖动调整时间轴高度"
       />
       <div className="timeline-toolbar">
         <button className="btn small" onClick={() => setPlaying(!playing)}>
           {playing ? '⏸' : '▶'}
         </button>
         <span className="timeline-time">
-          t={time.toFixed(1)}s / {duration.toFixed(1)}s
+          时间 {time.toFixed(1)}秒 / {duration.toFixed(1)}秒
         </span>
         <label className="timeline-field">
-          <span>Dur</span>
+          <span>时长</span>
           <input
             type="number"
             min={0.5}
@@ -278,7 +279,7 @@ export function Timeline(): JSX.Element {
           />
         </label>
         <label className="timeline-field">
-          <span>fps</span>
+          <span>帧率</span>
           <select value={shot.fps} onChange={onFps} style={{ width: 58 }}>
             <option value={24}>24</option>
             <option value={25}>25</option>
@@ -289,18 +290,18 @@ export function Timeline(): JSX.Element {
           className="btn small"
           disabled={!anyMarks}
           onClick={() => useStore.getState().selectAllMarks()}
-          title={`Select every mark on every lane (${window.blockout.platform.primaryModifier}A) — then ⌫ deletes them all, or shift times together in the inspector`}
+          title={`选择所有轨道的全部走位点（${window.blockout.platform.primaryModifier}A），再按 ⌫ 删除，或在属性面板中统一调整时间`}
         >
-          Select all
+          全选
         </button>
         <div className="timeline-warnings">
           {evaluator?.lineCrossings().map((c) => (
             <span
               key={`line-${c.fromMark}-${c.toMark}`}
               className="warning-chip"
-              title="The camera crosses the 180° line (the axis between your two lead characters) between these marks — screen direction will flip. Intentional crossings are fine; otherwise keep coverage on one side."
+              title="摄影机在这些走位点之间越过了 180° 轴线（两位主要角色之间的连线），画面中的方向会反转。可以有意越轴；否则应在轴线同一侧拍摄。"
             >
-              🎬 180° line crossed: cam mark {c.fromMark} → {c.toMark}
+              🎬 越过 180° 轴线：摄影机走位点 {c.fromMark} → {c.toMark}
             </span>
           ))}
           {evaluator?.warnings().map((w) => (
@@ -312,7 +313,7 @@ export function Timeline(): JSX.Element {
                 setSelection({ kind: 'mark', entityId: w.entityId, markId: w.toMarkId })
               }
             >
-              ⚠ {w.entityName}: implied {w.verdict.impliedSpeed.toFixed(1)} m/s — try{' '}
+              ⚠ {w.entityName}：所需速度 {w.verdict.impliedSpeed.toFixed(1)} 米/秒 · 建议{' '}
               {suggestionLabel(w.verdict.suggestion)}
             </span>
           ))}
@@ -330,7 +331,7 @@ export function Timeline(): JSX.Element {
             className="ruler-tick"
             style={{ left: `${(t / duration) * 100}%` }}
           >
-            {t}s
+            {t}秒
           </div>
         ))}
       </div>
@@ -356,7 +357,7 @@ export function Timeline(): JSX.Element {
         ))}
         {!anyMarks && (
           <div className="timeline-empty">
-            Select the camera or an actor and press M, then click the floor to drop marks.
+            选择摄影机或演员，按 M，再点击地面添加走位点。
           </div>
         )}
         <div className="playhead" style={{ left: playheadLeft }} />

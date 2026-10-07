@@ -13,6 +13,7 @@ import { getProfile, BUILTIN_PROFILES, type GeneratorProfile } from '@engine/pro
 import { ShotEvaluator } from '@engine/evaluate'
 import type { ProjectDoc, Scene, Shot } from '@engine/types'
 import { useStore } from '../store'
+import { zh } from '../i18n/zh-CN'
 import { getSceneManager, type SceneManager } from './scene-access'
 import { buildComfyWorkflow } from './comfy'
 
@@ -84,7 +85,7 @@ function getExportRenderer(): { canvas: HTMLCanvasElement; renderer: THREE.WebGL
 
 async function canvasPng(canvas: HTMLCanvasElement): Promise<ArrayBuffer> {
   const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'))
-  if (!blob) throw new Error('PNG encode failed')
+  if (!blob) throw new Error('PNG 编码失败')
   return blob.arrayBuffer()
 }
 
@@ -245,16 +246,16 @@ export async function exportShot(opts: ExportOptions): Promise<ExportResult> {
   const manager = getSceneManager()
   if (!doc || !scene || !shot || !folder || !manager) {
     const missing = !doc
-      ? 'no project open'
+      ? '尚未打开项目'
       : !scene || !shot
-        ? 'no shot selected'
+        ? '尚未选择镜头'
         : !folder
-          ? 'project has no folder'
-          : 'viewport not ready'
-    return { ok: false, error: `Cannot export: ${missing}.` }
+          ? '项目没有保存文件夹'
+          : '视口尚未就绪'
+    return { ok: false, error: `无法导出：${missing}。` }
   }
   if (useStore.getState().exportProgress.running) {
-    return { ok: false, error: 'An export is already running.' }
+    return { ok: false, error: '已有导出任务正在运行。' }
   }
   const profile = getProfile(opts.profileId)
   const { width, height } = exportDims(profile, shot.aspect, opts.resolution ?? 'auto')
@@ -270,7 +271,7 @@ export async function exportShot(opts: ExportOptions): Promise<ExportResult> {
 
   s.setExportProgress({
     running: true,
-    label: `Exporting ${shot.name}…`,
+    label: `正在导出 ${shot.name}…`,
     frame: 0,
     totalFrames,
     cancelRequested: false,
@@ -292,7 +293,8 @@ export async function exportShot(opts: ExportOptions): Promise<ExportResult> {
         height,
         opts.labels === 'on',
         (f) => {
-          s.setExportProgress({ frame: done + f, label: `Rendering ${suffix} pass…` })
+          const passName = pass === 'clean' ? '参考视频' : pass === 'depth' ? '深度' : '法线'
+          s.setExportProgress({ frame: done + f, label: `正在渲染${passName}通道…` })
         },
         isCancelled
       )
@@ -304,7 +306,7 @@ export async function exportShot(opts: ExportOptions): Promise<ExportResult> {
     }
 
     // --- Stills: every camera mark + first/last frame
-    s.setExportProgress({ label: 'Rendering stills…' })
+    s.setExportProgress({ label: '正在渲染静帧…' })
     const { canvas, renderer } = getExportRenderer()
     canvas.width = width
     canvas.height = height
@@ -343,18 +345,18 @@ export async function exportShot(opts: ExportOptions): Promise<ExportResult> {
     await window.blockout.exportWriteFile(
       `${pkg}/README.txt`,
       [
-        `Blockout export — ${scene.name} / Shot ${shot.name}`,
+        `Blockout 导出包 — ${scene.name} / 镜头 ${shot.name}`,
         ``,
-        `Target: ${profile.name} (${profile.vendor})`,
-        profile.attachHint,
+        `目标工具：${profile.name} (${profile.vendor})`,
+        zh(profile.attachHint),
         ``,
-        `Files:`,
-        `  *_reference.mp4   clean motion reference`,
-        opts.passes.depth ? `  *_depth.mp4       depth pass (structure conditioning)` : null,
-        opts.passes.normal ? `  *_normal.mp4      normal pass` : null,
-        `  stills/           frame at every camera mark + first/last + top-down blocking diagram`,
-        `  prompt.txt        copy-paste prompt tailored to ${profile.name}`,
-        `  metadata.json     machine-readable marks/lenses/timings`,
+        `文件说明：`,
+        `  *_reference.mp4   无界面元素的运动参考视频`,
+        opts.passes.depth ? `  *_depth.mp4       深度通道（用于结构控制）` : null,
+        opts.passes.normal ? `  *_normal.mp4      法线通道` : null,
+        `  stills/           各摄影机走位点的静帧、首尾帧和俯视走位图`,
+        `  prompt.txt        为 ${profile.name} 生成的英文提示词，可直接复制粘贴`,
+        `  metadata.json     可供程序读取的走位点、镜头参数和时间信息`,
         ``
       ]
         .filter((l): l is string => l !== null)
@@ -394,7 +396,7 @@ export async function exportStillAtPlayhead(
   const folder = s.projectFolder
   const manager = getSceneManager()
   if (!scene || !shot || !folder || !manager) {
-    return { ok: false, error: 'Open a project and select a shot first.' }
+    return { ok: false, error: '请先打开项目并选择镜头。' }
   }
   const t = s.time
   const { width, height } = exportDims(getProfile(profileId), shot.aspect, resolution)
@@ -425,14 +427,14 @@ export async function exportAnimatic(
   const s = useStore.getState()
   const scene = s.scene()
   const folder = s.projectFolder
-  if (!scene || !folder) return { ok: false, error: 'No scene.' }
+  if (!scene || !folder) return { ok: false, error: '尚未选择场景。' }
   // Stream-copy concat requires uniform codec parameters — mixed aspects or
   // frame rates would produce a file most players choke on.
   const formats = new Set(scene.shots.map((sh) => `${sh.aspect}@${sh.fps}`))
   if (formats.size > 1) {
     return {
       ok: false,
-      error: `Shots mix formats (${[...formats].join(', ')}) — set every shot in the scene to the same aspect and fps before exporting an animatic.`
+      error: `镜头格式不一致（${[...formats].join(', ')}）。导出动态分镜前，请将场景中所有镜头的画幅比例和帧率设为一致。`
     }
   }
   const originalShot = s.shotId
@@ -450,7 +452,7 @@ export async function exportAnimatic(
     })
     if (!res.ok || !res.packagePath) {
       if (originalShot) s.selectShot(originalShot)
-      return { ok: false, error: res.error ?? 'shot export failed' }
+      return { ok: false, error: res.error ?? '镜头导出失败' }
     }
     clips.push(`${res.packagePath}/${sanitize(shot.name)}_reference.mp4`)
   }
@@ -469,7 +471,7 @@ export async function exportContactSheet(): Promise<ExportResult> {
   const scene = s.scene()
   const folder = s.projectFolder
   const manager = getSceneManager()
-  if (!scene || !folder || !manager) return { ok: false, error: 'No scene.' }
+  if (!scene || !folder || !manager) return { ok: false, error: '尚未选择场景。' }
   const originalShot = s.shotId
 
   const cell = { w: 640, h: 360 }
@@ -484,8 +486,8 @@ export async function exportContactSheet(): Promise<ExportResult> {
   ctx.fillStyle = '#111113'
   ctx.fillRect(0, 0, sheet.width, sheet.height)
   ctx.fillStyle = '#ececf1'
-  ctx.font = 'bold 28px -apple-system, sans-serif'
-  ctx.fillText(`${scene.name} — contact sheet`, pad, 42)
+  ctx.font = 'bold 28px -apple-system, "Noto Sans CJK SC", "Microsoft YaHei", sans-serif'
+  ctx.fillText(`${scene.name} — 镜头一览`, pad, 42)
 
   const { canvas, renderer } = getExportRenderer()
   canvas.width = cell.w
@@ -525,7 +527,7 @@ export async function exportContactSheet(): Promise<ExportResult> {
   await new Promise((r) => setTimeout(r, 50))
 
   const blob = await new Promise<Blob | null>((r) => sheet.toBlob(r, 'image/png'))
-  if (!blob) return { ok: false, error: 'PNG encode failed' }
+  if (!blob) return { ok: false, error: 'PNG 编码失败' }
   const out = `${folder}/exports/${sanitize(scene.name)}/contact-sheet.png`
   await window.blockout.exportWriteFile(out, await blob.arrayBuffer())
   return { ok: true, packagePath: out }

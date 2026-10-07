@@ -16,11 +16,11 @@ export async function populateFromReference(): Promise<void> {
   const s = useStore.getState()
   if (!s.doc || !s.sceneId) return
   const file = await window.blockout.pickFile([
-    { name: 'Reference image or video', extensions: ['jpg', 'jpeg', 'png', 'webp', 'gif', 'mp4', 'mov', 'webm', 'm4v'] }
+    { name: '参考图片或视频', extensions: ['jpg', 'jpeg', 'png', 'webp', 'gif', 'mp4', 'mov', 'webm', 'm4v'] }
   ])
   if (!file) return
 
-  s.toast('Analyzing reference with Claude — this takes ~30–90 seconds…', 'info')
+  s.toast('正在使用 Claude 分析参考素材，预计需要 30–90 秒…', 'info')
   const result = await window.blockout.analyzeReference(file)
   if (!result.ok) {
     s.toast(result.error, 'error')
@@ -73,7 +73,7 @@ export async function populateFromReference(): Promise<void> {
 
   const camNote =
     useStore.getState().shot()?.camera.marks.length === 1
-      ? ' Camera Mark 1 set to match the reference framing — check the shot preview.'
+      ? ' 已设置摄影机标记 1 以匹配参考构图，请查看镜头预览。'
       : ''
-  s.toast(`Staged ${layout.entities.length} elements from the reference.${camNote} ${layout.notes}`, 'success')
+  s.toast(`已根据参考素材布置 ${layout.entities.length} 个元素。${camNote} ${layout.notes}`, 'success')
 }

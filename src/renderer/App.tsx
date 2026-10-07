@@ -47,7 +47,7 @@ export function Credits({ compact = false }: { compact?: boolean }): JSX.Element
         padding: compact ? '10px 12px' : 0
       }}
     >
-      Created by Sam Wasserman
+      由 Sam Wasserman 创作
       {compact ? <br /> : ' · '}
       <CreditLink url="https://wassermanproductions.com">wassermanproductions.com</CreditLink>
       {' · '}
@@ -55,7 +55,7 @@ export function Credits({ compact = false }: { compact?: boolean }): JSX.Element
       {!compact && (
         <>
           <br />
-          Open source under Apache-2.0 — keep this credit when using or forking.
+          基于 Apache-2.0 许可证开源，使用或创建分支时请保留此署名。
           {DISTRIBUTION.maintainerCredit && (
             <>
               <br />
@@ -87,18 +87,18 @@ function Welcome(): JSX.Element {
     if (!folder) return
     const { json, backupJson, backupNewer } = await window.blockout.loadProject(folder)
     if (!json && !backupJson) {
-      toast('No project.json found in that folder.', 'error')
+      toast('该文件夹中未找到 project.json。', 'error')
       return
     }
     // A meaningfully-newer autosave means the app died with unsaved work —
     // restore it (undo history is fresh either way; ⌘S makes it permanent).
     if (backupNewer && backupJson && loadFromJson(folder, backupJson)) {
-      toast('Restored unsaved work from the autosave backup — Save to keep it.', 'success')
+      toast('已从自动保存备份恢复未保存的内容，请保存以保留。', 'success')
       return
     }
     if (json && loadFromJson(folder, json)) return
     if (backupJson && loadFromJson(folder, backupJson)) {
-      toast('Recovered from autosave backup.', 'success')
+      toast('已从自动保存备份恢复。', 'success')
     }
   }, [loadFromJson, toast])
 
@@ -110,18 +110,17 @@ function Welcome(): JSX.Element {
         style={{ width: 260, height: 260, objectFit: 'contain', borderRadius: 16, marginBottom: -8 }}
       />
       <p>
-        Stage a scene, choreograph camera and character blocking with marks, and export
-        motion-reference packages for AI video generators.
+        搭建场景，用走位点编排摄影机与角色的运动，并导出供 AI 视频生成工具使用的动态参考包。
       </p>
       <div className="actions">
         <button className="btn primary" onClick={onNew}>
-          New Project
+          新建项目
         </button>
         <button className="btn" onClick={onOpen}>
-          Open Project…
+          打开项目…
         </button>
         <button className="btn" onClick={() => useStore.getState().setHelpOpen(true)}>
-          ? Tutorial
+          ? 教程
         </button>
       </div>
       <Credits />
@@ -247,24 +246,24 @@ export function App(): JSX.Element {
         </span>
         <div className="mode-switch">
           <button className={mode === 'stage' ? 'active' : ''} onClick={() => setMode('stage')}>
-            STAGE
+            布景
           </button>
           <button className={mode === 'shoot' ? 'active' : ''} onClick={() => setMode('shoot')}>
-            SHOOT
+            拍摄
           </button>
           <button className={mode === 'deliver' ? 'active' : ''} onClick={() => setMode('deliver')}>
-            DELIVER
+            交付
           </button>
         </div>
         <button className="btn small" onClick={onSave}>
-          Save
+          保存
         </button>
         <button
           className="btn small"
-          title="Help: quick start, how-do-I answers, shortcuts (?)"
+          title="帮助：快速入门、常见操作、快捷键（?）"
           onClick={() => useStore.getState().setHelpOpen(true)}
         >
-          ? Help
+          ? 帮助
         </button>
       </div>
 

@@ -17,6 +17,7 @@ import {
   type ExportResolution
 } from '../export/exporter'
 import { exportGlb } from '../export/gltf'
+import { zh } from '../i18n/zh-CN'
 
 export function DeliverPanel(): JSX.Element {
   const doc = useStore((s) => s.doc)
@@ -44,8 +45,8 @@ export function DeliverPanel(): JSX.Element {
   if (!scene || !shot) {
     return (
       <div className="deliver-panel">
-        <div className="panel-title">Deliver</div>
-        <p style={{ color: 'var(--text-dim)' }}>Select a shot to export.</p>
+        <div className="panel-title">导出</div>
+        <p style={{ color: 'var(--text-dim)' }}>请选择要导出的镜头。</p>
       </div>
     )
   }
@@ -58,19 +59,19 @@ export function DeliverPanel(): JSX.Element {
   const run = async (): Promise<void> => {
     const res = await exportShot({ profileId, passes, labels, resolution })
     if (res.ok && res.packagePath) {
-      toast('Export complete.', 'success')
+      toast('导出完成。', 'success')
       void window.blockout.showFolder(res.packagePath)
     } else if (res.error && res.error !== 'cancelled') {
-      toast(`Export failed: ${res.error}`, 'error')
+      toast(`导出失败：${zh(res.error)}`, 'error')
     }
   }
 
   return (
     <div className="deliver-panel">
-      <div className="panel-title">Deliver — {scene.name} / Shot {shot.name}</div>
+      <div className="panel-title">导出 — {scene.name} / 镜头 {shot.name}</div>
 
       <div className="field">
-        <label>Target generator</label>
+        <label>目标生成器</label>
         <select
           value={profileId}
           onChange={(e) => {
@@ -82,59 +83,59 @@ export function DeliverPanel(): JSX.Element {
         >
           {BUILTIN_PROFILES.map((p) => (
             <option key={p.id} value={p.id}>
-              {p.name} ({p.vendor})
+              {zh(p.name)} ({p.vendor})
             </option>
           ))}
         </select>
       </div>
 
       <p style={{ color: 'var(--text-dim)', fontSize: 12, marginBottom: 12, lineHeight: 1.5 }}>
-        {profile.attachHint}
+        {zh(profile.attachHint)}
       </p>
 
       {overCap && (
         <div className="warning-chip" style={{ marginBottom: 10 }}>
-          ⚠ Shot is {shot.duration.toFixed(1)}s but {profile.name} caps clips at{' '}
-          {profile.maxDuration}s — consider shortening.
+          ⚠ 镜头时长为 {shot.duration.toFixed(1)} 秒，{zh(profile.name)} 的片段上限为{' '}
+          {profile.maxDuration} 秒，建议缩短镜头。
         </div>
       )}
 
       <div className="field">
         <label>
-          Output — {dims.width}×{dims.height} @ {shot.fps}fps · {shot.aspect}
+          输出 — {dims.width}×{dims.height} @ {shot.fps} 帧/秒 · {shot.aspect}
         </label>
         <div className="seg">
           <button className={passes.clean ? 'active' : ''} onClick={() => setPasses((p) => ({ ...p, clean: !p.clean }))}>
-            Clean
+            纯净画面
           </button>
           <button className={passes.depth ? 'active' : ''} onClick={() => setPasses((p) => ({ ...p, depth: !p.depth }))}>
-            Depth
+            深度
           </button>
           <button className={passes.normal ? 'active' : ''} onClick={() => setPasses((p) => ({ ...p, normal: !p.normal }))}>
-            Normal
+            法线
           </button>
         </div>
         <p style={{ color: 'var(--text-dim)', fontSize: 11, marginTop: 6, lineHeight: 1.5 }}>
-          Physical-sky presets render into the <b>Clean</b> plate (deterministic, byte-reproducible) and
-          are held out of the Depth and Normal passes. Imported 3D scans are a staging aid and stay out
-          of every pass; they&apos;re listed in the package&apos;s <code>metadata.json</code>.
+          物理天空预设会渲染到<b>纯净画面</b>中，输出可逐字节复现；深度和法线通道不包含天空。
+          导入的 3D 扫描仅用于场景布置，不会出现在任何导出通道中；扫描信息会列在导出包的{' '}
+          <code>metadata.json</code> 中。
         </p>
       </div>
 
       <div className="field">
-        <label>Resolution</label>
+        <label>分辨率</label>
         <div className="seg">
           <button
             className={resolution === 'auto' ? 'active' : ''}
             onClick={() => setResolution('auto')}
-            title={`The profile's native size`}
+            title="使用生成器预设的原始尺寸"
           >
-            Auto
+            自动
           </button>
           <button
             className={resolution === '720p' ? 'active' : ''}
             onClick={() => setResolution('720p')}
-            title="720p — what Seedance accepts for reference files. Applies to videos, stills, and animatics."
+            title="720p — Seedance 接受的参考文件分辨率。适用于视频、静帧和动态分镜。"
           >
             720p
           </button>
@@ -149,16 +150,16 @@ export function DeliverPanel(): JSX.Element {
       </div>
 
       <div className="field">
-        <label>Labels</label>
+        <label>标签</label>
         <div className="seg">
           <button className={labels === 'on' ? 'active' : ''} onClick={() => setLabels('on')}>
-            In video
+            包含在视频中
           </button>
           <button className={labels === 'stillsOnly' ? 'active' : ''} onClick={() => setLabels('stillsOnly')}>
-            Stills only
+            仅静帧
           </button>
           <button className={labels === 'off' ? 'active' : ''} onClick={() => setLabels('off')}>
-            Off
+            关闭
           </button>
         </div>
       </div>
@@ -166,7 +167,7 @@ export function DeliverPanel(): JSX.Element {
       {progress.running ? (
         <div className="field">
           <label>
-            {progress.label} {progress.frame}/{progress.totalFrames}
+            {zh(progress.label)} {progress.frame}/{progress.totalFrames}
           </label>
           <div className="progress-bar">
             <div style={{ width: `${pct}%` }} />
@@ -176,7 +177,7 @@ export function DeliverPanel(): JSX.Element {
             style={{ marginTop: 8 }}
             onClick={() => setExportProgress({ cancelRequested: true })}
           >
-            Cancel
+            取消
           </button>
         </div>
       ) : (
@@ -186,7 +187,7 @@ export function DeliverPanel(): JSX.Element {
           disabled={!passes.clean && !passes.depth && !passes.normal}
           onClick={() => void run()}
         >
-          Export shot package
+          导出镜头包
         </button>
       )}
 
@@ -197,14 +198,14 @@ export function DeliverPanel(): JSX.Element {
         onClick={() =>
           void exportStillAtPlayhead(profileId, resolution, labels !== 'off').then((r) => {
             if (r.ok && r.packagePath) {
-              toast('Frame exported.', 'success')
+              toast('静帧已导出。', 'success')
               void window.blockout.showFolder(r.packagePath)
-            } else if (r.error) toast(`Frame export failed: ${r.error}`, 'error')
+            } else if (r.error) toast(`静帧导出失败：${zh(r.error)}`, 'error')
           })
         }
-        title="Export ONLY the frame at the playhead as a full-quality PNG — scrub to the exact moment you want first"
+        title="将播放头所在帧导出为全画质 PNG，请先将播放头移到所需时刻"
       >
-        📸 Export this frame (at playhead)
+        📸 导出当前帧（播放头位置）
       </button>
 
       {progress.lastPackagePath && !progress.running && (
@@ -213,12 +214,12 @@ export function DeliverPanel(): JSX.Element {
           style={{ width: '100%', marginBottom: 14 }}
           onClick={() => void window.blockout.showFolder(progress.lastPackagePath!)}
         >
-          {window.blockout.platform.isMac ? 'Reveal last export in Finder' : 'Show last export in Folder'}
+          {window.blockout.platform.isMac ? '在访达中显示上次导出' : '在文件夹中显示上次导出'}
         </button>
       )}
 
       <div className="panel-title" style={{ marginTop: 10 }}>
-        Prompt for {profile.name}
+        {zh(profile.name)} 提示词
       </div>
       <div className="prompt-box">{prompt}</div>
       <button
@@ -226,13 +227,13 @@ export function DeliverPanel(): JSX.Element {
         style={{ width: '100%', margin: '8px 0 18px' }}
         onClick={() => {
           void navigator.clipboard.writeText(prompt)
-          toast('Prompt copied.', 'success')
+          toast('提示词已复制。', 'success')
         }}
       >
-        Copy prompt
+        复制提示词
       </button>
 
-      <div className="panel-title">Scene tools</div>
+      <div className="panel-title">场景工具</div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         <button
           className="btn"
@@ -240,13 +241,13 @@ export function DeliverPanel(): JSX.Element {
           onClick={() =>
             void exportAnimatic(profileId, resolution).then((r) => {
               if (r.ok && r.packagePath) {
-                toast('Animatic exported.', 'success')
+                toast('动态分镜已导出。', 'success')
                 void window.blockout.showFolder(r.packagePath)
-              } else if (r.error && r.error !== 'cancelled') toast(`Animatic failed: ${r.error}`, 'error')
+              } else if (r.error && r.error !== 'cancelled') toast(`动态分镜导出失败：${zh(r.error)}`, 'error')
             })
           }
         >
-          Export scene animatic ({scene.shots.length} shots)
+          导出场景动态分镜（{scene.shots.length} 个镜头）
         </button>
         <button
           className="btn"
@@ -254,13 +255,13 @@ export function DeliverPanel(): JSX.Element {
           onClick={() =>
             void exportContactSheet().then((r) => {
               if (r.ok && r.packagePath) {
-                toast('Contact sheet exported.', 'success')
+                toast('分镜总览已导出。', 'success')
                 void window.blockout.showFolder(r.packagePath)
-              } else if (r.error) toast(`Contact sheet failed: ${r.error}`, 'error')
+              } else if (r.error) toast(`分镜总览导出失败：${zh(r.error)}`, 'error')
             })
           }
         >
-          Export contact sheet
+          导出分镜总览
         </button>
         <button
           className="btn"
@@ -268,13 +269,13 @@ export function DeliverPanel(): JSX.Element {
           onClick={() =>
             void exportGlb(profileId).then((r) => {
               if (r.ok && r.packagePath) {
-                toast('Blender package exported (.glb + import script).', 'success')
+                toast('Blender 文件包已导出（.glb + 导入脚本）。', 'success')
                 void window.blockout.showFolder(r.packagePath)
-              } else if (r.error) toast(`glTF export failed: ${r.error}`, 'error')
+              } else if (r.error) toast(`glTF 导出失败：${zh(r.error)}`, 'error')
             })
           }
         >
-          Export to Blender (.glb)
+          导出到 Blender（.glb）
         </button>
       </div>
     </div>

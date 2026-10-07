@@ -15,11 +15,11 @@ test.beforeAll(async () => {
   const dir = mkdtempSync(join(tmpdir(), 'blockout-r3-'))
   app = await electron.launch({
     args: ['out/main/index.js'],
-    env: { ...process.env, BLOCKOUT_SMOKE_DIR: dir }
+    env: { ...process.env, BLOCKOUT_SMOKE_DIR: dir, BLOCKOUT_CONFIG_DIR: join(dir, 'config') }
   })
   page = await app.firstWindow()
   await page.waitForLoadState('domcontentloaded')
-  await page.getByRole('button', { name: 'New Project' }).click()
+  await page.getByRole('button', { name: '新建项目' }).click()
   await page.waitForTimeout(400)
 })
 
@@ -152,7 +152,7 @@ test('record performer: cursor puppeteering lays actor marks with gaits', async 
     store.setSelection({ kind: 'entity', entityId: man.id })
   })
   await page.waitForTimeout(300)
-  await page.getByRole('button', { name: '● Record performer' }).click()
+  await page.getByRole('button', { name: '● 录制演员' }).click()
   const canvas = page.locator('.viewport-wrap canvas')
   const box = (await canvas.boundingBox())!
   const cx = box.x + box.width / 2
@@ -161,7 +161,7 @@ test('record performer: cursor puppeteering lays actor marks with gaits', async 
     await page.mouse.move(cx - 150 + i * 15, cy + Math.sin(i / 3) * 60)
     await page.waitForTimeout(75)
   }
-  await page.getByRole('button', { name: '■ Stop', exact: true }).click()
+  await page.getByRole('button', { name: '■ 停止', exact: true }).click()
   await page.waitForTimeout(400)
   const result = await page.evaluate(() => {
     const store = (window as any).__blockout.store.getState()
@@ -183,7 +183,7 @@ test('camera recording replays existing blocking and stops at shot end', async (
     return store.shot().duration
   })
   await page.waitForTimeout(200)
-  await page.getByRole('button', { name: '● Record camera' }).click()
+  await page.getByRole('button', { name: '● 录制摄影机' }).click()
   // Synced recording auto-stops at the end of the shot — just fly a little.
   const canvas = page.locator('.viewport-wrap canvas')
   const box = (await canvas.boundingBox())!
@@ -239,13 +239,13 @@ test('excludeFromExport hides an entity from rendered frames', async () => {
 })
 
 test('help & tutorial: opens from titlebar, has both tabs, closes', async () => {
-  await page.getByRole('button', { name: '? Help' }).click()
-  await expect(page.getByText('The whole app is three verbs')).toBeVisible()
-  await expect(page.getByText('Make them move')).toBeVisible()
-  await page.getByRole('button', { name: 'How do I…?' }).click()
-  await expect(page.getByText('How do I make two people fight?')).toBeVisible()
-  await page.getByRole('button', { name: 'Shortcuts' }).click()
-  await expect(page.getByText('Jump to camera mark N')).toBeVisible()
-  await page.getByRole('button', { name: 'Done' }).click()
-  await expect(page.getByText('Jump to camera mark N')).not.toBeVisible()
+  await page.getByRole('button', { name: '? 帮助' }).click()
+  await expect(page.getByText(/应用的工作流程分为三步/)).toBeVisible()
+  await expect(page.getByText('让角色动起来')).toBeVisible()
+  await page.getByRole('button', { name: '常见操作' }).click()
+  await expect(page.getByText('如何让两个人物打斗？')).toBeVisible()
+  await page.getByRole('button', { name: '快捷键' }).click()
+  await expect(page.getByText('跳到对应编号的摄影机走位点')).toBeVisible()
+  await page.getByRole('button', { name: '完成' }).click()
+  await expect(page.getByText('跳到对应编号的摄影机走位点')).not.toBeVisible()
 })

@@ -11,6 +11,7 @@ import { emit, type FramingKind } from '../bus'
 import { SceneManager } from './SceneManager'
 import { registerSceneManager, getSceneManager as getSceneManagerSafe } from '../export/scene-access'
 import { ReferenceUnderlay, ReferenceControls } from './ReferenceUnderlay'
+import { zh } from '../i18n/zh-CN'
 import { LENS_SET, SHOT_SIZES } from '@engine/camera'
 import type { AspectId, ShotSizeId } from '@engine/types'
 
@@ -56,43 +57,43 @@ function Hud(): JSX.Element | null {
 
   return (
     <div className="hud">
-      <button onClick={cycleLens} title="Focal length (click to cycle)">
-        <span className="hud-label">LENS</span>
+      <button onClick={cycleLens} title="焦距（点击切换）">
+        <span className="hud-label">焦距</span>
         {Math.round(lens)}mm
       </button>
-      <button onClick={cycleAspect} title="Aspect ratio (click to cycle)">
-        <span className="hud-label">AR</span>
+      <button onClick={cycleAspect} title="画幅比例（点击切换）">
+        <span className="hud-label">画幅</span>
         {shot.aspect}
       </button>
-      <button title="Shot duration — edit in the timeline">
-        <span className="hud-label">DUR</span>
-        {shot.duration.toFixed(1)}s
+      <button title="镜头时长 · 在时间轴中编辑">
+        <span className="hud-label">时长</span>
+        {shot.duration.toFixed(1)}秒
       </button>
-      <button title="Frame rate">
-        <span className="hud-label">FPS</span>
+      <button title="帧率">
+        <span className="hud-label">帧率</span>
         {shot.fps}
       </button>
       {mode === 'shoot' && (
-        <button title="Camera marks in this shot">
-          <span className="hud-label">MARKS</span>
+        <button title="此镜头中的摄影机走位点">
+          <span className="hud-label">走位点</span>
           {shot.camera.marks.length}
         </button>
       )}
       <button
         className={showMarks ? 'active' : ''}
         onClick={() => setShowMarks(!showMarks)}
-        title="Show/hide the spike-tape floor marks (editor only — never in exports)"
+        title="显示或隐藏地面的走位胶带标记（仅在编辑器中显示，不会导出）"
       >
         <span className="hud-label">{showMarks ? '👁' : '🚫'}</span>
-        MARKS
+        走位点
       </button>
       <button
         className={showPaths ? 'active' : ''}
         onClick={() => setShowPaths(!showPaths)}
-        title="Show/hide path ribbons, direction chevrons and time labels (editor only)"
+        title="显示或隐藏路径带、方向箭头和时间标签（仅在编辑器中显示）"
       >
         <span className="hud-label">{showPaths ? '👁' : '🚫'}</span>
-        PATHS
+        路径
       </button>
     </div>
   )
@@ -106,10 +107,10 @@ function ShotSizeRow(): JSX.Element {
         <button
           key={size}
           className="btn small"
-          title={`Auto-frame: ${SHOT_SIZES[size].name}`}
+          title={`自动构图：${zh(SHOT_SIZES[size].name)}`}
           onClick={() => emit('frameSubject', { size })}
         >
-          {size}
+          {zh(SHOT_SIZES[size].name)}
         </button>
       ))}
     </div>
@@ -121,12 +122,12 @@ function RecordControlToggle(): JSX.Element {
   const recordControl = useStore((s) => s.recordControl)
   const setRecordControl = useStore((s) => s.setRecordControl)
   const next = { precise: 'normal', normal: 'fast', fast: 'precise' } as const
-  const label = { precise: '🎯 Precise', normal: '✋ Normal', fast: '⚡ Fast' } as const
+  const label = { precise: '🎯 精准', normal: '✋ 标准', fast: '⚡ 快速' } as const
   return (
     <button
       className="btn small"
       onClick={() => setRecordControl(next[recordControl])}
-      title="Recording control: Precise = heavy smoothing + speed cap (slow, exact moves), Normal = balanced, Fast = raw and quick. Applies to performer puppeteering AND camera flying. Click to cycle."
+      title="录制操控：精准 = 强平滑和速度限制（缓慢、精确的移动）；标准 = 均衡；快速 = 直接、迅速。适用于演员操控和摄影机运动。点击切换。"
     >
       {label[recordControl]}
     </button>
@@ -136,12 +137,12 @@ function RecordControlToggle(): JSX.Element {
 /** One-click cinematography framings — writes the active camera mark. */
 function FramingRow(): JSX.Element {
   const framings: { kind: FramingKind; label: string; title: string }[] = [
-    { kind: '2S', label: '2-SHOT', title: 'Two-shot: fit the two characters side by side (select 3–4 for a group shot)' },
-    { kind: 'OTS', label: 'OTS', title: 'Over-the-shoulder: behind the near character, looking at the other' },
-    { kind: 'REV', label: 'REV', title: 'Reverse angle: swing the camera 180° around the subjects' },
-    { kind: 'TOP', label: 'TOP', title: 'Overhead: straight down, fitting everyone in frame' },
-    { kind: 'LOW', label: 'LOW', title: 'Low angle: knee height, looking up at the subject' },
-    { kind: 'DUTCH', label: 'DUTCH', title: 'Dutch angle: tilt the horizon (click again to flip, again to level)' }
+    { kind: '2S', label: '双人镜头', title: '双人镜头：将两位角色并排纳入画面（选择 3–4 人可拍摄群像）' },
+    { kind: 'OTS', label: '过肩镜头', title: '过肩镜头：从近处角色的肩后拍摄另一位角色' },
+    { kind: 'REV', label: '反打', title: '反打镜头：将摄影机绕拍摄主体旋转 180°' },
+    { kind: 'TOP', label: '俯拍', title: '俯拍镜头：垂直向下拍摄，将所有角色纳入画面' },
+    { kind: 'LOW', label: '仰拍', title: '仰拍镜头：从膝盖高度向上拍摄主体' },
+    { kind: 'DUTCH', label: '倾斜镜头', title: '倾斜镜头：倾斜地平线（再次点击反向倾斜，再点一次恢复水平）' }
   ]
   return (
     <div className="tool-row">
@@ -212,23 +213,23 @@ function TakeBar(): JSX.Element {
 
   return (
     <>
-      <div className="tool-row" title="Rehearse → Record → Review: the take loop">
+      <div className="tool-row" title="排练 → 录制 → 回看：一条拍摄的工作流程">
         <button
           className="btn small"
           onClick={rehearse}
           disabled={recording || countdown !== null}
-          title="Rehearse: play the take from the top with path ribbons on, so you can watch the blocking before you shoot"
+          title="排练：从头播放并显示路径带，拍摄前检查走位安排"
         >
-          🔁 Rehearse
+          🔁 排练
         </button>
         {recording ? (
           <button
             className="btn small"
             style={{ color: 'var(--danger)', borderColor: 'var(--danger)' }}
             onClick={() => useStore.getState().setRecording(false)}
-            title="Stop recording and save the take"
+            title="停止录制并保存这一条"
           >
-            ■ Stop take
+            ■ 停止录制
           </button>
         ) : (
           <>
@@ -236,9 +237,9 @@ function TakeBar(): JSX.Element {
               className="btn small"
               onClick={() => startCountdown('camera')}
               disabled={countdown !== null}
-              title="Record the camera move with a 3-2-1 countdown: fly the viewport; existing blocking replays underneath"
+              title="倒数 3、2、1 后录制摄影机运动：操控视图时会同步播放已有走位"
             >
-              ⏺ Record camera
+              ⏺ 录制摄影机
             </button>
             <button
               className="btn small"
@@ -246,11 +247,11 @@ function TakeBar(): JSX.Element {
               disabled={countdown !== null || !singleEntity}
               title={
                 singleEntity
-                  ? 'Record this performer with a 3-2-1 countdown: puppeteer it with the cursor'
-                  : 'Select one character or vehicle first to record its performance'
+                  ? '倒数 3、2、1 后录制此演员：用光标操控其表演'
+                  : '先选择一位角色或一辆载具，再录制其表演'
               }
             >
-              ⏺ Record performance
+              ⏺ 录制表演
             </button>
           </>
         )}
@@ -258,9 +259,9 @@ function TakeBar(): JSX.Element {
           className="btn small"
           onClick={review}
           disabled={recording || countdown !== null}
-          title="Review: play back through the shot camera (look-through on), exactly as it will export"
+          title="回看：通过镜头摄影机播放（开启摄影机视角），画面与导出结果一致"
         >
-          ▶ Review
+          ▶ 回看
         </button>
       </div>
       {countdown !== null && countdown > 0 && (
@@ -278,7 +279,7 @@ function TakeBar(): JSX.Element {
             cursor: 'pointer',
             background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.35), rgba(0,0,0,0.55))'
           }}
-          title="Click to cancel"
+          title="点击取消"
         >
           <div
             style={{
@@ -292,7 +293,7 @@ function TakeBar(): JSX.Element {
             {countdown}
           </div>
           <div style={{ marginTop: 10, fontSize: 13, letterSpacing: '0.14em', color: 'var(--text-faint)' }}>
-            {pending === 'performer' ? 'RECORDING PERFORMANCE…' : 'RECORDING CAMERA…'} · click to cancel
+            {pending === 'performer' ? '即将录制表演…' : '即将录制摄影机…'} · 点击取消
           </div>
         </div>
       )}
@@ -311,16 +312,16 @@ function GizmoModeRow(): JSX.Element {
       <button
         className={`btn small ${mode === 'translate' ? 'active' : ''}`}
         onClick={() => apply('translate')}
-        title="Move the selection with the gizmo arrows (G)"
+        title="使用操控箭头移动所选对象（G）"
       >
-        ⇄ Move
+        ⇄ 移动
       </button>
       <button
         className={`btn small ${mode === 'rotate' ? 'active' : ''}`}
         onClick={() => apply('rotate')}
-        title="Rotate the selection — spin people, cars, props, the camera (R)"
+        title="旋转所选角色、车辆、道具或摄影机（R）"
       >
-        ⟳ Rotate
+        ⟳ 旋转
       </button>
     </div>
   )
@@ -377,16 +378,16 @@ export function Viewport(): JSX.Element {
 
   let hint: string | null = null
   if (placingChoreography)
-    hint = `Click the floor to stage this ${placingChoreography.kind} routine there (facing you) · Esc to cancel`
+    hint = `点击地面放置${{ dance: '舞蹈', fight: '打斗', chase: '追逐' }[placingChoreography.kind]}编排（面向你）· Esc 取消`
   else if (placingSequence)
-    hint = `Click the floor to stage ${placingSequence.count} performers there (facing you) · Esc to cancel`
-  else if (placingAssetId) hint = `Click the floor to place · ${window.blockout.platform.alternateModifier}-click to place multiple · Esc to cancel`
+    hint = `点击地面放置 ${placingSequence.count} 位演员（面向你）· Esc 取消`
+  else if (placingAssetId) hint = `点击地面放置 · 按住 ${window.blockout.platform.alternateModifier} 点击可连续放置 · Esc 取消`
   else if (droppingMarks && selection?.kind === 'entity')
-    hint = 'Click the floor to drop marks in order · Esc when done'
+    hint = '按顺序点击地面添加走位点 · 完成后按 Esc'
   else if (droppingMarks && selection?.kind === 'camera')
-    hint = 'Click the floor to drop a camera mark · or use “Drop camera mark at view”'
+    hint = '点击地面添加摄影机走位点 · 或使用“在当前视图添加摄影机走位点”'
   else if (selection?.kind === 'entities')
-    hint = `${selection.entityIds.length} selected — drag moves the group · Marry in the inspector · ⌫ deletes all`
+    hint = `已选择 ${selection.entityIds.length} 个对象 · 拖动可整体移动 · 可在属性面板中绑定 · ⌫ 删除全部`
 
   return (
     <>
@@ -404,16 +405,16 @@ export function Viewport(): JSX.Element {
                   s.setTime(0)
                   s.setPlaying(true)
                 }}
-                title="Watch the shot: plays from the top through the shot camera (the designed frame, exactly as it will export)"
+                title="观看镜头：通过镜头摄影机从头播放，构图与导出结果一致"
               >
-                ▶ Play shot
+                ▶ 播放镜头
               </button>
               <button
                 className={`btn small ${lookThrough ? 'active' : ''}`}
                 onClick={() => setLookThrough(!lookThrough)}
-                title="Look through the shot camera (C)"
+                title="切换到镜头摄影机视角（C）"
               >
-                🎥 Look through
+                🎥 摄影机视角
               </button>
               <button
                 className="btn small"
@@ -421,17 +422,17 @@ export function Viewport(): JSX.Element {
                   setSelection({ kind: 'camera' })
                   emit('dropCameraMarkAtView', {})
                 }}
-                title="Drop a camera mark at the current view"
+                title="在当前视图添加摄影机走位点"
               >
-                + Cam mark
+                + 摄影机走位点
               </button>
               <button
                 className={`btn small ${droppingMarks ? 'active' : ''}`}
                 onClick={() => setDroppingMarks(!droppingMarks)}
                 disabled={!selection}
-                title="Drop marks for the selection by clicking the floor (M)"
+                title="点击地面，为所选对象添加走位点（M）"
               >
-                + Marks
+                + 走位点
               </button>
               <button
                 className={`btn small ${recording ? 'active' : ''}`}
@@ -439,11 +440,11 @@ export function Viewport(): JSX.Element {
                 onClick={() => setRecording(!recording)}
                 title={
                   singleEntitySelected
-                    ? 'Record THIS character/vehicle: puppeteer it with the cursor; other motion replays underneath'
-                    : 'Record the camera: fly the viewport; existing blocking replays while you record'
+                    ? '录制所选角色或载具：用光标操控，同时播放其他对象的动作'
+                    : '录制摄影机：操控视图，录制时会同步播放已有走位'
                 }
               >
-                {recording ? '■ Stop' : singleEntitySelected ? '● Record performer' : '● Record camera'}
+                {recording ? '■ 停止' : singleEntitySelected ? '● 录制演员' : '● 录制摄影机'}
               </button>
               <RecordControlToggle />
               <ReferenceControls />
@@ -458,9 +459,9 @@ export function Viewport(): JSX.Element {
               className="btn small"
               disabled={!selection || (selection.kind !== 'entity' && selection.kind !== 'entities')}
               onClick={() => getSceneManagerSafe()?.snapSelectionToGround()}
-              title="Rest the selection on whatever is beneath it — floor, table, truck bed"
+              title="将所选对象贴合到下方表面，例如地面、桌面或货车车厢"
             >
-              ⬇ Ground
+              ⬇ 贴合地面
             </button>
           </div>
         </div>
@@ -495,23 +496,23 @@ export function Viewport(): JSX.Element {
             }}
           >
             <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', color: 'var(--text-faint)' }}>
-              SHOT PREVIEW
+              镜头预览
             </span>
             <span style={{ flex: 1 }} />
             <button
               className="btn small"
               style={{ padding: '2px 7px', fontSize: 10 }}
-              title="Cycle preview size"
+              title="切换预览大小"
               onClick={() =>
                 setPipSize(pipSize === 'small' ? 'medium' : pipSize === 'medium' ? 'large' : 'small')
               }
             >
-              {pipSize === 'small' ? 'S' : pipSize === 'medium' ? 'M' : 'L'}
+              {pipSize === 'small' ? '小' : pipSize === 'medium' ? '中' : '大'}
             </button>
             <button
               className="btn small"
               style={{ padding: '2px 7px', fontSize: 10 }}
-              title="Hide preview"
+              title="隐藏预览"
               onClick={() => setPipSize('off')}
             >
               ✕
@@ -524,16 +525,16 @@ export function Viewport(): JSX.Element {
           className="btn small"
           style={{ position: 'absolute', right: 14, bottom: 14, zIndex: 5 }}
           onClick={() => setPipSize('medium')}
-          title="Show the live shot preview"
+          title="显示实时镜头预览"
         >
-          🎥 Preview
+          🎥 预览
         </button>
       )}
       {recording && (
         <div className="viewport-hint" style={{ borderColor: 'var(--danger)', color: 'var(--danger)' }}>
           {singleEntitySelected
-            ? '● REC — move the cursor over the floor; the performer chases it. ■ Stop saves the performance.'
-            : '● REC — fly the view (orbit/pan/zoom); this is the shot. ■ Stop saves the move.'}
+            ? '● 录制中 · 在地面上移动光标，演员会跟随移动。点击“■ 停止”保存表演。'
+            : '● 录制中 · 操控视图（环绕、平移、缩放）来录制镜头。点击“■ 停止”保存摄影机运动。'}
         </div>
       )}
 
@@ -592,12 +593,12 @@ export function Viewport(): JSX.Element {
       {!hasEntities && mode === 'stage' && (
         <div className="empty-state">
           <div style={{ fontSize: 36 }}>🎬</div>
-          <div>Click a library item, then click the floor to place it.</div>
+          <div>先点击资源库中的对象，再点击地面放置。</div>
         </div>
       )}
       {hasEntities && !hasMarks && mode === 'shoot' && !droppingMarks && (
         <div className="empty-state">
-          <div>Select an actor or the camera, press M, then click the floor to drop marks.</div>
+          <div>选择演员或摄影机，按 M，再点击地面添加走位点。</div>
         </div>
       )}
     </>

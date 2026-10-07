@@ -23,6 +23,7 @@ import { newId } from '@engine/ids'
 import { generateSequence, choreographMotion } from '@engine/sequences'
 import { buildRoutine } from '@engine/choreography'
 import { ACTION_PRESETS } from '@engine/action-presets'
+import { zh } from './i18n/zh-CN'
 
 export type Mode = 'stage' | 'shoot' | 'deliver'
 
@@ -269,6 +270,7 @@ export const useStore = create<BlockoutState>((set, get) => ({
   newProject(folder, name) {
     const doc = createProject(name)
     const scene = doc.scenes[0]!
+    scene.name = `场景 ${scene.number}`
     set({
       doc,
       projectFolder: folder,
@@ -287,7 +289,7 @@ export const useStore = create<BlockoutState>((set, get) => ({
   loadFromJson(folder, json) {
     const { doc, issues } = parseProject(json)
     if (!doc) {
-      get().toast(`Could not open project: ${issues[0]?.message ?? 'unknown error'}`, 'error')
+      get().toast(`无法打开项目：${issues[0]?.message ?? '未知错误'}`, 'error')
       return false
     }
     const scene = doc.scenes[0] ?? null
@@ -398,7 +400,7 @@ export const useStore = create<BlockoutState>((set, get) => ({
       }
     })
     set({ selection: null })
-    get().toast(n > 1 ? `Deleted ${n} marks.` : 'Mark deleted.', 'info')
+    get().toast(n > 1 ? `已删除 ${n} 个标记。` : '标记已删除。', 'info')
   },
   setHelpOpen: (helpOpen) => set({ helpOpen }),
   setShowMarks: (showMarks) => set({ showMarks }),
@@ -420,7 +422,7 @@ export const useStore = create<BlockoutState>((set, get) => ({
     if (exportProgress.running) {
       // The export loop is reading this document frame by frame; editing it
       // mid-export would change the video partway through.
-      get().toast('Editing is locked while an export is running.', 'info')
+      get().toast('导出期间无法编辑。', 'info')
       return
     }
     const next = structuredClone(doc)
@@ -514,7 +516,9 @@ export const useStore = create<BlockoutState>((set, get) => ({
   addSceneAfter() {
     get().mutate('add scene', (doc) => {
       const number = doc.scenes.length + 1
-      doc.scenes.push(createScene(number))
+      const scene = createScene(number)
+      scene.name = `场景 ${number}`
+      doc.scenes.push(scene)
     })
     const doc = get().doc!
     const added = doc.scenes[doc.scenes.length - 1]!
@@ -658,8 +662,8 @@ export const useStore = create<BlockoutState>((set, get) => ({
         married++
       }
     })
-    if (married > 0) get().toast(`Married ${married} to the anchor — they now move together.`, 'success')
-    if (cycles > 0) get().toast('Skipped a marriage that would loop back on itself.', 'error')
+    if (married > 0) get().toast(`已将 ${married} 个对象绑定到锚点，它们将一起移动。`, 'success')
+    if (cycles > 0) get().toast('已跳过会形成循环的绑定。', 'error')
   },
 
   unmarryEntities(entityIds) {
@@ -694,7 +698,7 @@ export const useStore = create<BlockoutState>((set, get) => ({
         delete entity.attachedLocal
       }
     })
-    get().toast('Unmarried — they move independently again.', 'info')
+    get().toast('已解除绑定，对象可独立移动。', 'info')
   },
 
   switchCamera(name) {
@@ -745,7 +749,7 @@ export const useStore = create<BlockoutState>((set, get) => ({
     })
     if (added) {
       set({ selection: { kind: 'camera' } })
-      get().toast(`Camera ${added} added — frame it and drop marks. Switch cameras with the A/B chips.`, 'success')
+      get().toast(`已添加摄影机 ${added}，请调整构图并放置标记。使用 A/B 按钮切换摄影机。`, 'success')
     }
   },
 
@@ -757,7 +761,7 @@ export const useStore = create<BlockoutState>((set, get) => ({
         scene?.shots.find((s) => s.id === shotId) ?? scene?.drafts?.find((s) => s.id === shotId)
       if (shot) shot.camera.marks = []
     })
-    get().toast('Camera move cleared — record or drop new marks.', 'info')
+    get().toast('摄影机运动已清除，可以重新录制或放置标记。', 'info')
   },
 
   saveDraftOfShot() {
@@ -785,7 +789,7 @@ export const useStore = create<BlockoutState>((set, get) => ({
       draftName = clone.name
       scene.drafts.push(clone)
     })
-    if (draftName) get().toast(`Saved as draft "${draftName}" — keep experimenting safely.`, 'success')
+    if (draftName) get().toast(`已保存为草稿“${draftName}”，可以继续尝试新的方案。`, 'success')
   },
 
   promoteDraft(draftId) {
@@ -810,7 +814,7 @@ export const useStore = create<BlockoutState>((set, get) => ({
     })
     if (promotedInto) {
       set({ shotId: promotedInto, time: 0, playing: false })
-      get().toast('Draft promoted — it is now the shot.', 'success')
+      get().toast('草稿已设为正式镜头。', 'success')
     }
   },
 
@@ -870,7 +874,7 @@ export const useStore = create<BlockoutState>((set, get) => ({
     if (newIds.length > 0) {
       set({ selection: { kind: 'entities', entityIds: newIds } })
       get().toast(
-        `${newIds.length} performers staged and choreographed — ▶ to watch. Drag the group to reposition; every performer stays individually editable.`,
+        `已布置并编排 ${newIds.length} 名演员，点击 ▶ 观看。拖动整组可调整位置，每名演员也可单独编辑。`,
         'success'
       )
     }
@@ -913,7 +917,7 @@ export const useStore = create<BlockoutState>((set, get) => ({
     if (newIds.length > 0) {
       set({ selection: { kind: 'entities', entityIds: newIds } })
       get().toast(
-        `Choreographed ${spec.kind} with ${newIds.length} performer${newIds.length > 1 ? 's' : ''} — ▶ to watch. Every performer stays individually editable.`,
+        `已为 ${newIds.length} 名演员编排${zh(spec.kind)}，点击 ▶ 观看。每名演员均可单独编辑。`,
         'success'
       )
     }
@@ -930,7 +934,7 @@ export const useStore = create<BlockoutState>((set, get) => ({
       .map((id) => scene?.entities.find((e) => e.id === id))
       .filter((e): e is Entity => !!e && e.assetId.startsWith('person.'))
     if (people.length === 0) {
-      get().toast('Choreography applies to people — select characters first.', 'info')
+      get().toast('动作编排适用于人物，请先选择角色。', 'info')
       return 0
     }
     // Stage the routine around the group's centroid, facing the first pick.
@@ -973,7 +977,7 @@ export const useStore = create<BlockoutState>((set, get) => ({
       }
     })
     if (applied > 0)
-      get().toast(`Choreographed ${applied} performer${applied > 1 ? 's' : ''} — ▶ to watch.`, 'success')
+      get().toast(`已为 ${applied} 名演员编排动作，点击 ▶ 观看。`, 'success')
     return applied
   },
 
@@ -1014,8 +1018,8 @@ export const useStore = create<BlockoutState>((set, get) => ({
         applied++
       }
     })
-    if (applied > 0) get().toast(`Restyled ${applied} performer${applied > 1 ? 's' : ''} — ▶ to watch.`, 'success')
-    else get().toast('That style applies to people — select characters.', 'info')
+    if (applied > 0) get().toast(`已更新 ${applied} 名演员的动作风格，点击 ▶ 观看。`, 'success')
+    else get().toast('此风格适用于人物，请选择角色。', 'info')
   },
 
   applyActionToEntities(entityIds, presetId) {
@@ -1058,20 +1062,20 @@ export const useStore = create<BlockoutState>((set, get) => ({
         applied++
       }
     })
-    if (applied > 0) get().toast(`Applied ${preset.name} to ${applied} performer${applied > 1 ? 's' : ''}.`, 'success')
+    if (applied > 0) get().toast(`已将“${zh(preset.name)}”应用于 ${applied} 名演员。`, 'success')
   },
 
   async importScan(sourcePath) {
     const { sceneId, projectFolder } = get()
     if (!projectFolder) {
-      get().toast('Open or save a project before importing a scan.', 'error')
+      get().toast('导入扫描前，请先打开或保存项目。', 'error')
       return
     }
     let result: { relativePath: string; name: string }
     try {
       result = await window.blockout.importScan(projectFolder, sourcePath)
     } catch (e) {
-      get().toast(`Scan import failed: ${(e as Error).message}`, 'error')
+      get().toast(`扫描导入失败：${(e as Error).message}`, 'error')
       return
     }
     const scan = createScan(result.name, result.relativePath, { x: 0, y: 0, z: 0 })
@@ -1086,7 +1090,7 @@ export const useStore = create<BlockoutState>((set, get) => ({
     })
     set({ selection: { kind: 'scan', scanId: scan.id } })
     get().toast(
-      `Scan "${scan.name}" imported — block your action inside it. Scans stay in the editor and never appear in exports.`,
+      `已导入扫描“${scan.name}”，可在其中布置动作。扫描仅在编辑器中显示，不会出现在导出画面中。`,
       'success'
     )
   },
@@ -1139,14 +1143,14 @@ export const useStore = create<BlockoutState>((set, get) => ({
       blocking: structuredClone(scene.blocking)
     }
     const res = await window.blockout.presetSave(name, JSON.stringify(payload))
-    if (res.ok) get().toast(`Preset "${name}" saved — reuse it from the Library in any project.`, 'success')
-    else get().toast(`Could not save preset: ${res.error ?? 'unknown error'}`, 'error')
+    if (res.ok) get().toast(`预设“${name}”已保存，可在任意项目的资源库中使用。`, 'success')
+    else get().toast(`无法保存预设：${res.error ?? '未知错误'}`, 'error')
   },
 
   async applyStagePreset(id) {
     const json = await window.blockout.presetLoad(id)
     if (!json) {
-      get().toast('Preset not found — it may have been deleted.', 'error')
+      get().toast('找不到预设，它可能已被删除。', 'error')
       return
     }
     let payload: {
@@ -1158,7 +1162,7 @@ export const useStore = create<BlockoutState>((set, get) => ({
     try {
       payload = JSON.parse(json)
     } catch {
-      get().toast('Preset file is corrupted.', 'error')
+      get().toast('预设文件已损坏。', 'error')
       return
     }
     // Stage into a brand-new scene with fresh ids so the preset (and any
@@ -1166,7 +1170,7 @@ export const useStore = create<BlockoutState>((set, get) => ({
     let newSceneId: string | null = null
     get().mutate('apply stage preset', (doc) => {
       const scene = createScene(doc.scenes.length + 1)
-      if (payload.name) scene.name = payload.name
+      scene.name = payload.name || `场景 ${scene.number}`
       if (payload.environment) scene.environment = structuredClone(payload.environment)
       const idMap = new Map<string, string>()
       for (const src of payload.entities ?? []) {
@@ -1200,7 +1204,7 @@ export const useStore = create<BlockoutState>((set, get) => ({
     })
     if (newSceneId) {
       get().selectScene(newSceneId)
-      get().toast(`Staged "${payload.name ?? 'preset'}" as a new scene — the original preset is untouched.`, 'success')
+      get().toast(`已将“${payload.name ?? '预设'}”布置为新场景，原预设已保留。`, 'success')
     }
   },
 

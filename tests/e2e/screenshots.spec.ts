@@ -19,7 +19,7 @@ test.beforeAll(async () => {
   const smokeDir = mkdtempSync(join(tmpdir(), 'blockout-screens-'))
   app = await electron.launch({
     args: ['out/main/index.js'],
-    env: { ...process.env, BLOCKOUT_SMOKE_DIR: smokeDir }
+    env: { ...process.env, BLOCKOUT_SMOKE_DIR: smokeDir, BLOCKOUT_CONFIG_DIR: join(smokeDir, 'config') }
   })
   page = await app.firstWindow()
   await page.setViewportSize({ width: 1600, height: 1000 })
@@ -33,7 +33,7 @@ test.afterAll(async () => {
 test('capture all modes', async () => {
   test.setTimeout(120_000)
   await page.screenshot({ path: `${OUT}/00-welcome.png` })
-  await page.getByRole('button', { name: 'New Project' }).click()
+  await page.getByRole('button', { name: '新建项目' }).click()
   await page.waitForTimeout(600)
   await page.screenshot({ path: `${OUT}/01-stage-empty.png` })
 

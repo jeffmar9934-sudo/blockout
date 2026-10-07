@@ -79,10 +79,10 @@ ipcMain.handle('dialog:newProject', async () => {
   }
   if (!mainWindow) return null
   const result = await dialog.showSaveDialog(mainWindow, {
-    title: 'Create Blockout Project',
-    buttonLabel: 'Create',
-    nameFieldLabel: 'Project name',
-    defaultPath: join(app.getPath('documents'), 'Untitled.blockout')
+    title: '创建 Blockout 项目',
+    buttonLabel: '创建',
+    nameFieldLabel: '项目名称',
+    defaultPath: join(app.getPath('documents'), '未命名.blockout')
   })
   if (result.canceled || !result.filePath) return null
   const withoutExtension = result.filePath.replace(/\.blockout$/i, '')
@@ -100,9 +100,9 @@ ipcMain.handle('dialog:openProject', async () => {
   }
   if (!mainWindow) return null
   const result = await dialog.showOpenDialog(mainWindow, {
-    title: 'Open Blockout Project',
+    title: '打开 Blockout 项目',
     properties: ['openDirectory'],
-    message: 'Choose a .blockout project folder'
+    message: '请选择 .blockout 项目文件夹'
   })
   if (result.canceled || result.filePaths.length === 0) return null
   return result.filePaths[0]
@@ -193,10 +193,10 @@ ipcMain.handle('file:readAbsolute', async (_e, folder: string, relativePath: str
   // Only serve files inside the project folder (resolve + separator check
   // so "/a/b" can't leak "/a/bad" and "../" can't escape).
   const portablePath = normalizeProjectRelativePath(relativePath)
-  if (!portablePath) throw new Error('path must be relative to the project folder')
+  if (!portablePath) throw new Error('路径必须相对于项目文件夹')
   const base = resolve(folder)
   const full = resolve(base, ...portablePath.split('/'))
-  if (full !== base && !full.startsWith(base + sep)) throw new Error('path escapes project folder')
+  if (full !== base && !full.startsWith(base + sep)) throw new Error('路径超出了项目文件夹')
   const data = await readFile(full)
   return data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength)
 })
@@ -279,11 +279,11 @@ ipcMain.handle(
     // take down the main process — absorb it and mark the job dead instead.
     child.stdin?.on('error', (err) => {
       job.dead = true
-      job.deadReason = `encoder pipe error: ${String(err)}`
+      job.deadReason = `编码器管道错误：${String(err)}`
     })
     child.on('close', (code) => {
       job.dead = true
-      job.deadReason = job.deadReason || `ffmpeg exited ${code}`
+      job.deadReason = job.deadReason || `FFmpeg 已退出，退出码：${code}`
       mainWindow?.webContents.send('export:closed', jobId, code ?? -1, stderrTail || job.deadReason)
       jobs.delete(jobId)
     })
@@ -297,8 +297,8 @@ ipcMain.handle(
 
 ipcMain.handle('export:frame', async (_e, jobId: string, frame: ArrayBuffer) => {
   const job = jobs.get(jobId)
-  if (!job) throw new Error(`no export job ${jobId}`)
-  if (job.dead) throw new Error(job.deadReason || 'encoder terminated')
+  if (!job) throw new Error(`找不到导出任务 ${jobId}`)
+  if (job.dead) throw new Error(job.deadReason || '编码器已终止')
   job.framesReceived++
   const buf = Buffer.from(frame)
   const stdin = job.ffmpeg.stdin!
@@ -315,7 +315,7 @@ ipcMain.handle('export:frame', async (_e, jobId: string, frame: ArrayBuffer) => 
       stdin.once('error', done)
       stdin.once('close', done)
     })
-    if (job.dead) throw new Error(job.deadReason || 'encoder terminated')
+    if (job.dead) throw new Error(job.deadReason || '编码器已终止')
   }
   return true
 })

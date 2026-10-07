@@ -18,6 +18,7 @@ import {
 } from '@engine/choreography'
 import { useStore } from '../store'
 import { populateFromReference } from '../ai/populate'
+import { zh } from '../i18n/zh-CN'
 
 interface PresetInfo {
   id: string
@@ -62,17 +63,16 @@ function StagePresets(): JSX.Element {
 
   const onDelete = async (p: PresetInfo): Promise<void> => {
     await window.blockout.presetDelete(p.id)
-    toast(`Preset "${p.name}" deleted.`, 'info')
+    toast(`已删除预设“${p.name}”。`, 'info')
     await refresh()
   }
 
   return (
     <div className="panel-section">
-      <div className="panel-title">Stage Presets</div>
+      <div className="panel-title">场景预设</div>
       {presets.length === 0 && !naming && (
         <div className="empty-hint" style={{ fontSize: 12, opacity: 0.7, marginBottom: 6 }}>
-          Save a staging you'll reuse — a dinner scene, a driving setup — and
-          start from it in any project.
+          保存可重复使用的场景布置，例如聚餐场景或驾驶场景，之后可在任何项目中使用。
         </div>
       )}
       {presets.map((p) => (
@@ -80,17 +80,17 @@ function StagePresets(): JSX.Element {
           key={p.id}
           style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}
         >
-          <span style={{ flex: 1, fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={`${p.entityCount} items · saved ${new Date(p.savedAt).toLocaleDateString()}`}>
+          <span style={{ flex: 1, fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={`${p.entityCount} 个对象 · 保存于 ${new Date(p.savedAt).toLocaleDateString('zh-CN')}`}>
             {p.name}
           </span>
           <button
             className="btn small"
             onClick={() => void applyStagePreset(p.id)}
-            title="Stage this preset as a NEW scene — the preset itself stays untouched"
+            title="用此预设创建新场景，预设本身保持不变"
           >
-            Stage
+            布置
           </button>
-          <button className="btn small" onClick={() => void onDelete(p)} title="Delete this preset">
+          <button className="btn small" onClick={() => void onDelete(p)} title="删除此预设">
             ✕
           </button>
         </div>
@@ -100,7 +100,7 @@ function StagePresets(): JSX.Element {
           <input
             type="text"
             autoFocus
-            placeholder="Preset name… e.g. Dinner scene"
+            placeholder="预设名称…例如：聚餐场景"
             value={name}
             onChange={(e) => setName(e.target.value)}
             onKeyDown={(e) => {
@@ -110,7 +110,7 @@ function StagePresets(): JSX.Element {
             style={{ flex: 1 }}
           />
           <button className="btn small primary" onClick={() => void onSave()}>
-            Save
+            保存
           </button>
         </div>
       ) : (
@@ -119,9 +119,9 @@ function StagePresets(): JSX.Element {
           style={{ width: '100%', marginTop: 6 }}
           disabled={(scene?.entities.length ?? 0) === 0}
           onClick={() => setNaming(true)}
-          title="Save this scene's staging (set, characters, blocking) as a reusable preset available in every project"
+          title="将此场景的布景、角色和调度保存为可在任何项目中使用的预设"
         >
-          ＋ Save current staging as preset
+          ＋ 将当前场景布置保存为预设
         </button>
       )}
     </div>
@@ -144,17 +144,17 @@ function Sequences(): JSX.Element {
   const activeStyle = styles.some((s) => s.id === style) ? style : styles[0]!.id
 
   const TYPE_LABELS: { id: SequenceType; label: string }[] = [
-    { id: 'dance', label: '💃 Dance number' },
-    { id: 'fight', label: '🥊 Fight' },
-    { id: 'footChase', label: '🏃 Foot chase' },
-    { id: 'carChase', label: '🚗 Car chase' }
+    { id: 'dance', label: '💃 舞蹈表演' },
+    { id: 'fight', label: '🥊 打斗' },
+    { id: 'footChase', label: '🏃 徒步追逐' },
+    { id: 'carChase', label: '🚗 汽车追逐' }
   ]
 
   return (
     <div className="panel-section">
-      <div className="panel-title">Sequences</div>
+      <div className="panel-title">群体动作</div>
       <div className="field">
-        <label>Type</label>
+        <label>类型</label>
         <select value={type} onChange={(e) => setType(e.target.value as SequenceType)}>
           {TYPE_LABELS.map((t) => (
             <option key={t.id} value={t.id}>
@@ -165,7 +165,7 @@ function Sequences(): JSX.Element {
       </div>
       <div className="field-row">
         <div className="field" style={{ flex: 1 }}>
-          <label>Performers</label>
+          <label>表演者人数</label>
           <input
             type="number"
             min={2}
@@ -178,11 +178,11 @@ function Sequences(): JSX.Element {
           />
         </div>
         <div className="field" style={{ flex: 2 }}>
-          <label>Style</label>
+          <label>风格</label>
           <select value={activeStyle} onChange={(e) => setStyle(e.target.value)}>
             {styles.map((s) => (
               <option key={s.id} value={s.id}>
-                {s.name}
+                {zh(s.name)}
               </option>
             ))}
           </select>
@@ -194,9 +194,9 @@ function Sequences(): JSX.Element {
         onClick={() =>
           setPlacingSequence(placingSequence ? null : { type, count, style: activeStyle })
         }
-        title="Arms placement — then click the floor exactly where you want the group. It stages there, facing the camera. Esc cancels. One undo step; every performer stays individually editable."
+        title="进入放置模式，然后点击地面指定人群位置。人物面向摄影机；按 Esc 取消。可一次撤销，且每位表演者均可单独编辑。"
       >
-        {placingSequence ? '⟳ Click the floor to place… (Esc cancels)' : `🎬 Stage ${count} performers`}
+        {placingSequence ? '⟳ 点击地面放置…（Esc 取消）' : `🎬 布置 ${count} 位表演者`}
       </button>
     </div>
   )
@@ -252,25 +252,25 @@ function Choreographer(): JSX.Element {
 
   const onApply = (): void => {
     if (selCount === 0) {
-      toast('Select the performers to choreograph first.', 'info')
+      toast('请先选择需要编排动作的表演者。', 'info')
       return
     }
-    if (!window.confirm(`Replace the choreography of ${selCount} selected performer${selCount > 1 ? 's' : ''}?`))
+    if (!window.confirm(`替换 ${selCount} 位已选表演者的动作编排？`))
       return
     choreographSelected(spec())
   }
 
   const KIND_LABELS: { id: ChoreoKind; label: string }[] = [
-    { id: 'dance', label: '💃 Dance number' },
-    { id: 'fight', label: '🥋 Fight' },
-    { id: 'chase', label: '🏃 Chase' }
+    { id: 'dance', label: '💃 舞蹈表演' },
+    { id: 'fight', label: '🥋 打斗' },
+    { id: 'chase', label: '🏃 追逐' }
   ]
 
   return (
     <div className="panel-section">
-      <div className="panel-title">Choreographer</div>
+      <div className="panel-title">动作编排</div>
       <div className="field">
-        <label>Routine</label>
+        <label>编排类型</label>
         <select value={kind} onChange={(e) => setKind(e.target.value as ChoreoKind)}>
           {KIND_LABELS.map((k) => (
             <option key={k.id} value={k.id}>
@@ -281,17 +281,17 @@ function Choreographer(): JSX.Element {
       </div>
       <div className="field-row">
         <div className="field" style={{ flex: 2 }}>
-          <label>Style</label>
+          <label>风格</label>
           <select value={activeStyle} onChange={(e) => setStyle(e.target.value)}>
             {styles.map((s) => (
               <option key={s.id} value={s.id}>
-                {s.name}
+                {zh(s.name)}
               </option>
             ))}
           </select>
         </div>
         <div className="field" style={{ flex: 1 }}>
-          <label>Performers</label>
+          <label>表演者人数</label>
           <input
             type="number"
             min={kind === 'dance' ? 1 : 2}
@@ -306,7 +306,7 @@ function Choreographer(): JSX.Element {
       </div>
       <div className="field-row">
         <div className="field" style={{ flex: 1 }}>
-          <label>Duration (s)</label>
+          <label>时长（秒）</label>
           <input
             type="number"
             min={2}
@@ -320,7 +320,7 @@ function Choreographer(): JSX.Element {
         </div>
         {kind === 'dance' && (
           <div className="field" style={{ flex: 1 }}>
-            <label>BPM</label>
+            <label>节拍（BPM）</label>
             <input
               type="number"
               min={60}
@@ -335,11 +335,11 @@ function Choreographer(): JSX.Element {
         )}
         {(kind === 'fight' || kind === 'chase') && (
           <div className="field" style={{ flex: 2 }}>
-            <label>Ending</label>
+            <label>结局</label>
             <select value={activeEnding} onChange={(e) => setEnding(e.target.value)}>
               {endings.map((en) => (
                 <option key={en.id} value={en.id}>
-                  {en.name}
+                  {zh(en.name)}
                 </option>
               ))}
             </select>
@@ -349,21 +349,21 @@ function Choreographer(): JSX.Element {
       {kind === 'dance' && (
         <>
           <div className="field">
-            <label>Formation</label>
+            <label>队形</label>
             <select value={formation} onChange={(e) => setFormation(e.target.value as FormationId)}>
               {choreoFormations().map((f) => (
                 <option key={f.id} value={f.id}>
-                  {f.name}
+                  {zh(f.name)}
                 </option>
               ))}
             </select>
           </div>
           <div className="field-row" style={{ gap: 12, marginBottom: 6, flexWrap: 'wrap' }}>
             <label style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12 }}>
-              <input type="checkbox" checked={canon} onChange={(e) => setCanon(e.target.checked)} /> Canon
+              <input type="checkbox" checked={canon} onChange={(e) => setCanon(e.target.checked)} /> 依次跟随
             </label>
             <label style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12 }}>
-              <input type="checkbox" checked={mirror} onChange={(e) => setMirror(e.target.checked)} /> Mirror
+              <input type="checkbox" checked={mirror} onChange={(e) => setMirror(e.target.checked)} /> 镜像动作
             </label>
             <label style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12 }}>
               <input
@@ -371,7 +371,7 @@ function Choreographer(): JSX.Element {
                 checked={formationChange}
                 onChange={(e) => setFormationChange(e.target.checked)}
               />{' '}
-              Formations
+              队形变化
             </label>
           </div>
         </>
@@ -379,12 +379,12 @@ function Choreographer(): JSX.Element {
       {kind === 'fight' && (
         <div className="field-row" style={{ gap: 12, marginBottom: 6 }}>
           <label style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12 }}>
-            <input type="checkbox" checked={mirror} onChange={(e) => setMirror(e.target.checked)} /> Mirror stance
+            <input type="checkbox" checked={mirror} onChange={(e) => setMirror(e.target.checked)} /> 镜像站姿
           </label>
         </div>
       )}
       <div className="field">
-        <label>Seed</label>
+        <label>随机种子</label>
         <div className="field-row" style={{ gap: 6 }}>
           <input
             type="number"
@@ -395,7 +395,7 @@ function Choreographer(): JSX.Element {
               if (!Number.isNaN(v)) setSeed(Math.max(0, Math.round(v)))
             }}
           />
-          <button className="btn small" title="Reroll the seed" onClick={() => setSeed(randomSeed())}>
+          <button className="btn small" title="重新生成随机种子" onClick={() => setSeed(randomSeed())}>
             🎲
           </button>
         </div>
@@ -404,17 +404,17 @@ function Choreographer(): JSX.Element {
         className={`btn primary${placing ? ' active' : ''}`}
         style={{ width: '100%', marginBottom: 6 }}
         onClick={() => setPlacing(placing ? null : spec())}
-        title="Arm placement — then click the floor where the routine should stage, facing the camera. Esc cancels. One undo step; every performer stays editable."
+        title="进入放置模式，点击地面指定编排位置。人物面向摄影机；按 Esc 取消。可一次撤销，每位表演者均可编辑。"
       >
-        {placing ? '⟳ Click the floor to place… (Esc cancels)' : '🎬 Spawn routine'}
+        {placing ? '⟳ 点击地面放置…（Esc 取消）' : '🎬 创建动作编排'}
       </button>
       <button
         className="btn"
         style={{ width: '100%' }}
         onClick={onApply}
-        title="Replace the choreography of the selected performers with this routine (keeps their look)."
+        title="用此编排替换已选表演者的动作，保留其外观。"
       >
-        {selCount > 0 ? `Apply to ${selCount} selected` : 'Apply to selection'}
+        {selCount > 0 ? `应用到 ${selCount} 位已选表演者` : '应用到所选表演者'}
       </button>
     </div>
   )
@@ -646,13 +646,13 @@ function thumbFor(id: string): string {
 
 /** Fixed display order of categories with human-readable titles. */
 const CATEGORY_ORDER: { key: EntityCategory; title: string }[] = [
-  { key: 'people', title: 'People' },
-  { key: 'animals', title: 'Animals' },
-  { key: 'vehicles', title: 'Vehicles' },
-  { key: 'furniture', title: 'Furniture' },
-  { key: 'props', title: 'Props' },
-  { key: 'environment', title: 'Environments' },
-  { key: 'primitives', title: 'Primitives' }
+  { key: 'people', title: '人物' },
+  { key: 'animals', title: '动物' },
+  { key: 'vehicles', title: '交通工具' },
+  { key: 'furniture', title: '家具' },
+  { key: 'props', title: '道具' },
+  { key: 'environment', title: '环境' },
+  { key: 'primitives', title: '基础几何体' }
 ]
 
 export function Library(): JSX.Element {
@@ -671,7 +671,9 @@ export function Library(): JSX.Element {
     const q = query.trim().toLowerCase()
     const matches = (a: AssetSpec): boolean =>
       q === '' ||
+      zh(a.name).toLowerCase().includes(q) ||
       a.name.toLowerCase().includes(q) ||
+      zh(a.category).toLowerCase().includes(q) ||
       a.category.toLowerCase().includes(q)
     return CATEGORY_ORDER.filter(
       ({ key }) => categoryFilter === 'all' || key === categoryFilter
@@ -692,7 +694,7 @@ export function Library(): JSX.Element {
 
   const onImportScan = async (): Promise<void> => {
     const path = await window.blockout.pickFile([
-      { name: '3D Scans (Gaussian splats)', extensions: ['ply', 'splat', 'ksplat', 'spz'] }
+      { name: '3D 扫描（高斯泼溅）', extensions: ['ply', 'splat', 'ksplat', 'spz'] }
     ])
     if (!path) return
     await importScan(path)
@@ -700,11 +702,11 @@ export function Library(): JSX.Element {
 
   const onImport = async (): Promise<void> => {
     const path = await window.blockout.pickFile([
-      { name: '3D Models', extensions: ['glb', 'gltf', 'obj'] }
+      { name: '3D 模型', extensions: ['glb', 'gltf', 'obj'] }
     ])
     if (!path) return
     if (!projectFolder) {
-      toast('Open or save a project before importing models.', 'error')
+      toast('导入模型前，请先打开或保存项目。', 'error')
       return
     }
     try {
@@ -719,9 +721,9 @@ export function Library(): JSX.Element {
           }
         }
       })
-      toast(`Imported ${result.name}`, 'success')
+      toast(`已导入 ${result.name}`, 'success')
     } catch (e) {
-      toast(`Import failed: ${(e as Error).message}`, 'error')
+      toast(`导入失败：${(e as Error).message}`, 'error')
     }
   }
 
@@ -734,7 +736,7 @@ export function Library(): JSX.Element {
       <div className="library-search">
         <input
           type="text"
-          placeholder="Search assets…"
+          placeholder="搜索资源…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
@@ -746,9 +748,9 @@ export function Library(): JSX.Element {
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value as EntityCategory | 'all')}
-            title="Show one category at a time"
+            title="仅显示所选分类"
           >
-            <option value="all">All categories</option>
+            <option value="all">全部分类</option>
             {CATEGORY_ORDER.map((c) => (
               <option key={c.key} value={c.key}>
                 {c.title}
@@ -758,14 +760,14 @@ export function Library(): JSX.Element {
           <select
             value={placingAssetId && ASSET_CATALOG.some((a) => a.id === placingAssetId) ? placingAssetId : ''}
             onChange={(e) => setPlacingAsset(e.target.value || null)}
-            title="Pick from the full list — then click the floor to place it"
+            title="从完整列表中选择资源，再点击地面放置"
           >
-            <option value="">Place from list…</option>
+            <option value="">从列表中选择资源…</option>
             {CATEGORY_ORDER.map((c) => (
               <optgroup key={c.key} label={c.title}>
                 {ASSET_CATALOG.filter((a) => a.category === c.key).map((a) => (
                   <option key={a.id} value={a.id}>
-                    {thumbFor(a.id)} {a.name}
+                    {thumbFor(a.id)} {zh(a.name)}
                   </option>
                 ))}
               </optgroup>
@@ -780,7 +782,7 @@ export function Library(): JSX.Element {
             className="panel-title"
             style={{ cursor: 'pointer', userSelect: 'none', display: 'flex', justifyContent: 'space-between' }}
             onClick={() => toggleCollapsed(group.key)}
-            title={collapsed[group.key] ? 'Expand' : 'Collapse'}
+            title={collapsed[group.key] ? '展开' : '折叠'}
           >
             <span>
               {group.title} <span style={{ opacity: 0.5 }}>({group.items.length})</span>
@@ -796,7 +798,7 @@ export function Library(): JSX.Element {
                   onClick={() => onPick(asset.id)}
                 >
                   <span className="thumb">{thumbFor(asset.id)}</span>
-                  <span className="name">{asset.name}</span>
+                  <span className="name">{zh(asset.name)}</span>
                 </div>
               ))}
             </div>
@@ -809,23 +811,23 @@ export function Library(): JSX.Element {
           className="btn primary"
           style={{ width: '100%', marginBottom: 8 }}
           onClick={() => void populateFromReference()}
-          title="Give Claude a reference photo or video frame — it stages the scene to match: people, furniture, poses, lighting, and a camera to match the framing"
+          title="给 Claude 一张参考照片或视频帧，即可匹配人物、家具、姿态、灯光和摄影机构图来布置场景"
         >
-          ✨ Populate from reference…
+          ✨ 根据参考图布置场景…
         </button>
         <button className="btn" style={{ width: '100%', marginBottom: 8 }} onClick={() => void onImport()}>
-          Import 3D Model…
+          导入 3D 模型…
         </button>
         <button
           className="btn"
           style={{ width: '100%' }}
           onClick={() => void onImportScan()}
-          title="Load a Gaussian-splat scan of a real location (.ply/.splat/.ksplat/.spz) and block your scene inside it. Scan with any phone app (Polycam, Luma, Scaniverse) or a video-to-3D tool. Editor staging only — scans never appear in exports."
+          title="加载真实地点的高斯泼溅扫描（.ply/.splat/.ksplat/.spz），在其中进行场景调度。可使用 Polycam、Luma、Scaniverse 等手机应用或视频转 3D 工具扫描。扫描仅用于编辑器布置，不会出现在导出画面中。"
         >
-          🏙 Import 3D Scan…
+          🏙 导入 3D 扫描…
         </button>
         <p style={{ color: 'var(--text-faint)', fontSize: 10.5, lineHeight: 1.4, margin: '6px 0 0' }}>
-          Scans: phone-capture a real location, then stage and block inside it.
+          用手机扫描真实地点，即可在其中布置场景并安排调度。
         </p>
       </div>
     </>

@@ -16,8 +16,8 @@
   --accent-text: #16130b;
   --danger: #e5484d;
   --success: #46a758;
-  --mono: 'SF Mono', ui-monospace, Menlo, monospace;
-  --sans: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+  --mono: 'SF Mono', ui-monospace, Menlo, 'Noto Sans CJK SC', 'Microsoft YaHei', monospace;
+  --sans: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', 'Noto Sans CJK SC', 'Microsoft YaHei', 'PingFang SC', sans-serif;
   --radius: 8px;
 }
 

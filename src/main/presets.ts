@@ -74,7 +74,7 @@ export function registerPresetsIpc(): void {
         const entityCount = Array.isArray(payload.entities) ? payload.entities.length : 0
         const record: PresetFile = {
           id,
-          name: name.trim() || 'Untitled preset',
+          name: name.trim() || '未命名预设',
           savedAt: new Date().toISOString(),
           entityCount,
           payload

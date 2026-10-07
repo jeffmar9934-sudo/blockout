@@ -30,39 +30,39 @@ interface Card {
 const CARDS: Card[] = [
   {
     emoji: '🏗',
-    title: 'Stage your set',
-    body: 'Drop an environment and people from the Library, then click the floor to place them.',
-    then: 'then: label your leads and set the light.'
+    title: '搭建布景',
+    body: '从资源库选择环境和人物，再点击地面放置。',
+    then: '接下来：为主角设置标签，并调整灯光。'
   },
   {
     emoji: '🎬',
-    title: 'One-click sequences',
-    body: 'Whole dance numbers, fights, and chases, already choreographed. Click the floor to place the cast.',
-    then: 'then: every performer stays editable on their own.'
+    title: '一键编排动作',
+    body: '选择已编排好的舞蹈、打斗或追逐，再点击地面放置整组演员。',
+    then: '接下来：每位演员仍可单独编辑。'
   },
   {
     emoji: '🚶',
-    title: 'Make them move',
-    body: 'Select someone, press M and click marks. Or hit ● Record to puppeteer them with your cursor.',
-    then: 'then: retime the pills on the timeline.'
+    title: '让角色动起来',
+    body: '选择角色，按 M 并点击地面设置走位点，也可点击“● 录制”，用鼠标控制角色。',
+    then: '接下来：在时间线上调整走位点的时间。'
   },
   {
     emoji: '✨',
-    title: 'Animate tab',
-    body: 'Fights, dances, and sit / drink / jump moves for any character. One click lays them down.',
-    then: 'then: tweak the pose marks like any other.'
+    title: '动作选项卡',
+    body: '一键为角色添加打斗、舞蹈、坐下、喝水、跳跃等动作。',
+    then: '接下来：像其他走位点一样调整姿态关键点。'
   },
   {
     emoji: '🎥',
-    title: 'Frame & move the camera',
-    body: 'Pick a framing, choose from 39 camera moves, or Track a subject so the aim locks on.',
-    then: 'then: ▶ Play shot to see the exact export frame.'
+    title: '构图与运镜',
+    body: '选择构图和 39 种运镜预设，或开启主体跟踪，让摄影机始终对准主体。',
+    then: '接下来：点击“▶ 播放镜头”查看实际导出画面。'
   },
   {
     emoji: '📦',
-    title: 'Deliver',
-    body: 'Pick your generator and export the package: video, depth pass, stills, and a written prompt.',
-    then: 'then: paste the prompt straight into the generator.'
+    title: '交付',
+    body: '选择视频生成工具，导出包含视频、深度通道、静帧和提示词的参考包。',
+    then: '接下来：将提示词直接粘贴到生成工具中。'
   }
 ]
 
@@ -75,428 +75,420 @@ interface Task {
 
 const TASKS: { area: string; items: Task[] }[] = [
   {
-    area: 'Stage',
+    area: '布景',
     items: [
       {
-        q: 'How do I put a set and people in the scene?',
+        q: '如何在场景中放置布景和人物？',
         a: (
           <>
-            In <b>STAGE</b> mode, click a Library item (a person, prop, or a whole environment kit),
-            then click the floor. Hold <Kbd>{ALT}</Kbd> to place several; <Kbd>Esc</Kbd> cancels.
+            在<b>布景</b>模式中，点击资源库中的人物、道具或整套环境，再点击地面放置。
+            按住 <Kbd>{ALT}</Kbd> 可连续放置多个；按 <Kbd>Esc</Kbd> 取消。
           </>
         )
       },
       {
-        q: 'How do I move, rotate, or duplicate something?',
+        q: '如何移动、旋转或复制物体？',
         a: (
           <>
-            Click to select, then drag the arrows to move. Press <Kbd>R</Kbd> to rotate,{' '}
-            <Kbd>G</Kbd> back to move, <Kbd>{`${MOD}D`}</Kbd> to duplicate, <Kbd>⌫</Kbd> to delete.
+            点击选中物体，拖动箭头移动。按 <Kbd>R</Kbd> 切换为旋转，按 <Kbd>G</Kbd> 切回移动，
+            按 <Kbd>{`${MOD}D`}</Kbd> 复制，按 <Kbd>⌫</Kbd> 删除。
           </>
         )
       },
       {
-        q: 'How do I name a character for the AI generator?',
+        q: '如何为 AI 视频生成工具设置角色标签？',
         a: (
           <>
-            Select the person and type a label like <b>HERO</b> in the inspector, then pick a color.
-            It floats above them, tints the model, and tells the generator who is who.
+            选中人物，在属性面板中输入<b>主角</b>等标签，再选择颜色。
+            标签会显示在角色上方，模型也会着色，帮助生成工具区分角色。
           </>
         )
       },
       {
-        q: 'How do I pose someone without animating?',
+        q: '如何只设置人物姿态，不添加动画？',
         a: (
           <>
-            Use the inspector&apos;s <b>Pose</b> section — Stand, Sit, Crouch, Lie, Talk, Fallen.
-            Open <b>Pose limbs</b> for 14 sliders to build fight or dance stances.
+            在属性面板的<b>姿态</b>区域选择站立、坐下、蹲下、躺下、说话或倒地。
+            展开<b>肢体姿态</b>，通过滑块调整打斗或舞蹈姿势。
           </>
         )
       },
       {
-        q: 'How do I put a rider on a bike so they move together?',
+        q: '如何让骑手与自行车一起移动？',
         a: (
           <>
-            Place the person, then choose <b>Marry to…</b> the bike in their inspector. Drag the
-            bike and the rider comes along; <b>Unmarry</b> separates them.
+            放置人物后，在人物的属性面板中选择<b>绑定到…</b>并指定自行车。
+            拖动自行车时骑手会随之移动；点击<b>解除绑定</b>可将两者分开。
           </>
         )
       },
       {
-        q: 'How do I move a whole crowd I placed?',
+        q: '如何一起移动已放置的一群人物？',
         a: (
           <>
-            Marry every performer to one lead, then move that lead — the group follows. Or{' '}
-            <Kbd>⇧</Kbd>-click them all and drag, since a multi-selection moves as one.
+            将所有演员绑定到一位领队，移动领队时整组会跟随。也可按住 <Kbd>⇧</Kbd>
+            逐个点击选中，再拖动整个多选组。
           </>
         )
       },
       {
-        q: 'How do I set the lighting?',
+        q: '如何设置灯光？',
         a: (
           <>
-            With nothing selected, the inspector shows the scene: pick a preset (Day, Golden hour,
-            Night, Club…), drag the sun, add fog. Generators read light direction from your reference.
+            取消所有选择后，属性面板会显示场景设置。选择日间、黄金时刻、夜晚、夜店等预设，
+            调整太阳位置并添加雾。视频生成工具会从参考画面中识别光照方向。
           </>
         )
       },
       {
-        q: 'How do I get a real sky over the scene?',
+        q: '如何为场景添加真实天空？',
         a: (
           <>
-            Pick a physical-sky preset — <b>Midday Sky</b>, <b>Golden Sky</b>, or <b>Blue Hour Sky</b> —
-            in the scene inspector. The sky is lit from the sun azimuth/elevation and renders into the
-            clean export (it stays out of the depth and normal passes).
+            在场景属性面板中选择物理天空预设：<b>正午天空</b>、<b>黄金时段天空</b>或<b>蓝调时刻天空</b>。
+            天空光照由太阳方位角和高度角决定，会出现在纯净画面导出中，但不会进入深度或法线通道。
           </>
         )
       },
       {
-        q: 'How do I stage a scene from a photo?',
+        q: '如何根据照片搭建场景？',
         a: (
           <>
-            <b>Populate from reference…</b> at the bottom of the Library stages people, poses,
-            lighting, and a matching camera from an image. Needs a Claude API key; one <Kbd>{`${MOD}Z`}</Kbd> undoes it all.
+            资源库底部的<b>根据参考图布置场景…</b>可根据图像生成人物、姿态、灯光和匹配的摄影机构图。
+            此功能需要 Claude API 密钥；按一次 <Kbd>{`${MOD}Z`}</Kbd> 即可撤销全部生成内容。
           </>
         )
       },
       {
-        q: 'How do I bring in my own 3D model?',
+        q: '如何导入自己的 3D 模型？',
         a: (
           <>
-            <b>Import 3D Model…</b> in the Library loads a GLB/glTF and copies it into the project.
+            点击资源库中的<b>导入 3D 模型…</b>，载入 GLB/glTF 文件并复制到项目中。
           </>
         )
       },
       {
-        q: 'How do I block inside a real location I scanned?',
+        q: '如何在扫描得到的真实场地中编排走位？',
         a: (
           <>
-            Scan a place with your phone (Polycam, Luma, Scaniverse) or any video-to-3D tool, then{' '}
-            <b>Import 3D scan…</b> in the Library. Position it with the inspector&apos;s Scans fields
-            and block the action inside it. Scans are a staging aid — they stay out of every export.
+            用手机上的 Polycam、Luma、Scaniverse 或视频转 3D 工具扫描场地，再点击资源库中的
+            <b>导入 3D 扫描…</b>。在属性面板的扫描设置中调整位置，然后在场地内编排动作。
+            扫描内容用于辅助布景，不会出现在任何导出中。
           </>
         )
       },
       {
-        q: 'How do I keep something out of the render but visible while I work?',
+        q: '如何让物体在编辑时可见，但不出现在导出中？',
         a: (
           <>
-            Select it and tick <b>Hide in exports</b> in the inspector. It stays in the editor but
-            drops out of every rendered pass.
+            选中物体，在属性面板中勾选<b>导出时隐藏</b>。
+            物体仍会显示在编辑器中，但所有渲染通道都会将其隐藏。
           </>
         )
       }
     ]
   },
   {
-    area: 'Shoot',
+    area: '拍摄',
     items: [
       {
-        q: 'How do I make someone walk a path?',
+        q: '如何让人物沿路径行走？',
         a: (
           <>
-            In <b>SHOOT</b>, select them, press <Kbd>M</Kbd>, and click the floor to drop marks.
-            They walk between marks on the timeline; select a mark to set its gait or hold.
+            在<b>拍摄</b>模式中选中人物，按 <Kbd>M</Kbd>，再点击地面放置走位点。
+            人物会按时间线在走位点之间行走；选中走位点可设置步态或停留时间。
           </>
         )
       },
       {
-        q: 'How do I puppeteer someone with my mouse instead?',
+        q: '如何用鼠标直接控制角色移动？',
         a: (
           <>
-            Select a character or vehicle and press <b>● Record performer</b> — steer with the
-            cursor and the gait matches your speed. <b>■ Stop</b> saves; re-record to replace it.
+            选中角色或车辆，点击<b>● 录制演员</b>，用鼠标引导移动，步态会自动匹配移动速度。
+            点击<b>■ 停止</b>保存；重新录制会替换此前的动作。
           </>
         )
       },
       {
-        q: 'How do I run a take — rehearse, record, review?',
+        q: '如何完成排练、录制和回看？',
         a: (
           <>
-            The <b>Take bar</b> in Shoot walks the whole loop: <b>🔁 Rehearse</b> plays the blocking
-            with path ribbons on; <b>⏺ Record camera</b> / <b>⏺ Record performance</b> start after a
-            3-2-1 countdown; <b>▶ Review</b> plays back through the shot camera. Click the countdown to cancel.
+            拍摄模式的<b>拍摄控制栏</b>涵盖完整流程：<b>🔁 排练</b>会显示路径并播放走位；
+            <b>⏺ 录制摄影机</b>或<b>⏺ 录制表演</b>会在 3、2、1 倒计时后开始录制；
+            <b>▶ 回看</b>通过当前镜头的摄影机回放。点击倒计时可取消。
           </>
         )
       },
       {
-        q: 'How do I show or hide the floor marks and paths?',
+        q: '如何显示或隐藏地面走位点和路径？',
         a: (
           <>
-            The viewport HUD has <b>MARKS</b> and <b>PATHS</b> eye toggles. Marks are the numbered
-            spike-tape T&apos;s; selecting an actor or the camera adds direction chevrons and{' '}
-            <b>t=2.4s</b> time labels along its path. Both are editor-only — they never appear in an export.
+            视口工具栏中的<b>走位点</b>和<b>路径</b>可切换显示。走位点是带编号的 T 形地面标记；
+            选中演员或摄影机时，其路径上会显示方向箭头和 <b>t=2.4s</b> 等时间标签。
+            这些辅助标记仅用于编辑，不会出现在导出画面中。
           </>
         )
       },
       {
-        q: 'How do I learn blocking step by step?',
+        q: '如何逐步学习编排走位？',
         a: (
           <>
-            Open the <b>Set your marks</b> coach from the Quick start tab — a checklist that ticks
-            itself off as you select an actor, drop two marks, play, record, and open the export.
+            从快速入门选项卡打开<b>设置走位点</b>引导。
+            选择演员、放置两个走位点、播放、录制并打开交付面板后，清单会自动勾选已完成的步骤。
           </>
         )
       },
       {
-        q: 'How do I make two people fight?',
+        q: '如何让两个人物打斗？',
         a: (
           <>
-            Select a person, open the <b>Animate</b> tab, and Apply a fight move — it lays down
-            editable pose marks at the playhead. Do the same on their opponent to trade blows.
+            选中人物，打开<b>动作</b>选项卡并应用打斗动作，播放头处会添加可编辑的姿态关键点。
+            为对手也添加动作，即可编排双方的攻防。
           </>
         )
       },
       {
-        q: 'How do I make a character dance?',
+        q: '如何让角色跳舞？',
         a: (
           <>
-            Select them and Apply a dance from the <b>Animate</b> tab (hip-hop, salsa, moonwalk,
-            breakdance…). Or in Stage, drop a whole <b>Dance number</b> sequence at once.
+            选中角色，从<b>动作</b>选项卡应用街舞、萨尔萨、太空步、霹雳舞等舞蹈。
+            也可在布景模式中一次性放置完整的<b>舞蹈表演</b>动作序列。
           </>
         )
       },
       {
-        q: 'How do I fly a plate across the room?',
+        q: '如何让盘子飞过房间？',
         a: (
           <>
-            Select any entity and Apply a flight from <b>Action presets</b>, or <b>● Record</b> it
-            and use the <b>scroll wheel for altitude</b>. Set a mark&apos;s <b>Altitude</b> by hand later.
+            选中任意物体，从<b>路径预设</b>应用飞行动作，或点击<b>● 录制</b>并用<b>鼠标滚轮调整高度</b>。
+            之后也可手动设置走位点的<b>高度</b>。
           </>
         )
       },
       {
-        q: 'How do I land a plane or topple a building?',
+        q: '如何让飞机降落或建筑倒塌？',
         a: (
           <>
-            Aim the entity first, then Apply from <b>Action presets</b> — plane takeoff / landing /
-            flyby, heli orbit, car chase moves, falling debris, building topple. The path starts
-            from where it stands.
+            先调整物体朝向，再从<b>路径预设</b>中应用飞机起飞、降落、掠过、直升机盘旋、
+            汽车追逐、碎片坠落或建筑倒塌等动作。路径从物体当前位置开始。
           </>
         )
       },
       {
-        q: 'How do I have someone board a bus or get off a plane?',
+        q: '如何让人物上公交车或下飞机？',
         a: (
           <>
-            Select an actor&apos;s last mark and set <b>Board on arrival → the Bus</b>. To alight,
-            marry them to a parked plane, then give them marks that start after it lands.
+            选中演员的最后一个走位点，将<b>到达后搭乘</b>设为公交车。
+            要让人物下飞机，先将人物绑定到停放的飞机，再添加从飞机落地后开始的走位点。
           </>
         )
       },
       {
-        q: 'How do I retime or delete a move on the timeline?',
+        q: '如何在时间线上调整动作时间或删除动作？',
         a: (
           <>
-            Drag a pill to retime it, drag its right edge to add a hold, and double-click to delete.
-            <Kbd>⇧</Kbd>-click to multi-select pills.
+            拖动走位点块可调整时间，拖动右边缘可添加停留，双击可删除。
+            按住 <Kbd>⇧</Kbd> 并点击可多选走位点。
           </>
         )
       },
       {
-        q: 'How do I make a whole choreographed group at once?',
+        q: '如何一次性放置整组已编排好动作的演员？',
         a: (
           <>
-            In Stage, the <b>Sequences</b> box stages a full cast: Dance number, Fight, Foot chase,
-            or Car chase. Set the count and style, and it drops them already choreographed.
+            在布景模式的<b>群体动作</b>中选择舞蹈表演、打斗、徒步追逐或汽车追逐。
+            设置人数和风格后即可放置整组演员，动作已自动编排。
           </>
         )
       },
       {
-        q: 'How do I choreograph a real routine — timed exchanges and formations?',
+        q: '如何编排带节奏、攻防配合和队形的完整动作？',
         a: (
           <>
-            The <b>Choreographer</b> panel builds staged dance phrases, paired fight exchanges, and
-            chases with formations, canon, and mirroring. <b>Spawn</b> a fresh cast, or select people
-            you already placed and <b>Apply to selection</b>. The dice re-rolls the seed.
+            <b>动作编排</b>面板可生成分段舞蹈、双人攻防和追逐，并支持队形、错拍跟随和镜像。
+            点击<b>创建动作编排</b>放置新角色，或选中已有角色后点击<b>应用到所选表演者</b>。
+            点击骰子可随机更换种子。
           </>
         )
       }
     ]
   },
   {
-    area: 'Camera',
+    area: '摄影机',
     items: [
       {
-        q: 'How do I frame a shot?',
+        q: '如何为镜头构图？',
         a: (
           <>
-            Select the camera and press <Kbd>C</Kbd> to look through it, then pick a shot size
-            (WS/MS/CU) to auto-frame, or a framing (<b>2-SHOT / OTS / REV / TOP / LOW / DUTCH</b>).
+            选中摄影机并按 <Kbd>C</Kbd> 切换到摄影机视角，再选择远景、中景或特写（WS/MS/CU）
+            自动构图，也可选择<b>双人／过肩／反打／俯拍／仰拍／荷兰角</b>等构图方式。
           </>
         )
       },
       {
-        q: 'How do I move the camera during a shot?',
+        q: '如何在镜头中移动摄影机？',
         a: (
           <>
-            Frame it, drop <b>+ Cam mark</b>, move and reframe, drop another — it travels between
-            marks. Pick a <b>rig</b> (dolly, steadicam, handheld, crane, drone) for the motion feel.
+            完成构图后点击<b>+ 摄影机走位点</b>，移动摄影机并重新构图，再添加下一个走位点。
+            摄影机会在这些点之间运动。选择轨道、斯坦尼康、手持、摇臂或无人机等<b>摄影机支撑方式</b>来调整运动质感。
           </>
         )
       },
       {
-        q: 'How do I use one of the ready-made camera moves?',
+        q: '如何使用预设运镜？',
         a: (
           <>
-            The camera inspector has <b>39 moves</b> — orbits, cranes, drone follows, whip pan,
-            vertigo dolly-zoom, spiral in/out, crash-zoom, dutch roll. One click lays down editable
-            marks around your subject.
+            摄影机属性面板提供<b>39 种运镜</b>，包括环绕、摇臂、无人机跟随、甩镜、滑动变焦、
+            螺旋推近或拉远、急速变焦和荷兰角滚转。一键即可在主体周围生成可编辑的摄影机走位点。
           </>
         )
       },
       {
-        q: 'How do I track a plane with the camera?',
+        q: '如何让摄影机跟踪飞机？',
         a: (
           <>
-            Turn on <b>Track subject</b> in the camera inspector and pick the subject — the aim
-            locks on no matter how it moves, and focus follows too.
+            在摄影机属性面板中启用<b>跟踪主体</b>并选择主体。
+            无论主体如何移动，摄影机都会持续对准它，焦点也会跟随。
           </>
         )
       },
       {
-        q: 'How do I fly the camera like an operator?',
+        q: '如何像摄影师一样操控摄影机？',
         a: (
           <>
-            Select the camera and press <b>● Record camera</b> — your blocking replays while you
-            orbit, pan, and zoom the view, and your flight becomes the move, synced to the action.
+            选中摄影机并点击<b>● 录制摄影机</b>。角色走位会同步回放，
+            你可环绕、平移和缩放视图，操作轨迹会录制为与角色动作同步的运镜。
           </>
         )
       },
       {
-        q: 'How do I add a second camera?',
+        q: '如何添加第二台摄影机？',
         a: (
           <>
-            <b>Cameras (A/B/C)</b> at the top of the camera inspector: <b>+</b> adds Camera B with
-            its own marks and rig. The chips switch between them; the export uses the active one.
+            在摄影机属性面板顶部的<b>摄影机（A/B/C）</b>区域点击<b>+</b>，添加拥有独立走位点和支撑方式的摄影机 B。
+            点击摄影机按钮可切换；导出时会使用当前摄影机。
           </>
         )
       },
       {
-        q: 'How do I watch exactly what will export?',
+        q: '如何查看实际导出的画面？',
         a: (
           <>
-            <b>▶ Play shot</b> plays through the shot camera — the exact export frame. The{' '}
-            <b>SHOT PREVIEW</b> box shows it live; <Kbd>Space</Kbd> plays, <Kbd>1–9</Kbd> jump to camera marks.
+            点击<b>▶ 播放镜头</b>，从镜头摄影机视角查看实际导出画面。
+            <b>镜头预览</b>窗口会实时显示画面；按 <Kbd>Space</Kbd> 播放，按 <Kbd>1–9</Kbd> 跳到对应的摄影机走位点。
           </>
         )
       },
       {
-        q: 'How do I match an existing shot?',
+        q: '如何复现已有镜头？',
         a: (
           <>
-            <b>🎞 Ref</b> ghosts any video (even a depth-map video) over the viewport, synced to
-            your timeline — recreate its blocking by eye and adjust opacity and offset.
+            <b>🎞 参考</b>可将视频（包括深度图视频）半透明叠加在视口上，并与时间线同步。
+            对照画面复现走位，可调整透明度和时间偏移。
           </>
         )
       },
       {
-        q: 'How do I try a risky version without losing my shot?',
+        q: '如何尝试新的镜头方案并保留原镜头？',
         a: (
           <>
-            Hover the shot in the left rail and click <b>+ Draft</b> — it snapshots as &quot;1A v1&quot;.
-            Drafts play and export like shots; <b>▲</b> promotes one back to the real shot.
+            将鼠标移到左侧列表中的镜头上，点击<b>+ 草稿</b>，即可保存为“1A v1”等快照版本。
+            草稿可像正式镜头一样播放和导出；点击<b>▲</b>可将草稿设为正式镜头。
           </>
         )
       }
     ]
   },
   {
-    area: 'Deliver',
+    area: '交付',
     items: [
       {
-        q: 'How do I export the package for my generator?',
+        q: '如何导出供视频生成工具使用的参考包？',
         a: (
           <>
-            In <b>DELIVER</b>, pick your target (Seedance, Veo, Kling, LTX, Wan…) and hit{' '}
-            <b>Export shot package</b> — clean MP4, depth pass, stills, top-down diagram, and a
-            written prompt.
+            在<b>交付</b>模式中选择 Seedance、Veo、Kling、LTX、Wan 等目标工具，然后点击
+            <b>导出镜头包</b>，生成纯净 MP4、深度通道、静帧、俯视示意图和提示词。
           </>
         )
       },
       {
-        q: 'How do I get a 720p file for Seedance?',
+        q: '如何导出适用于 Seedance 的 720p 文件？',
         a: (
           <>
-            Set <b>Resolution</b> to 720p in Deliver — that&apos;s what Seedance accepts for
-            reference files. It applies to videos, stills, and animatics.
+            在交付面板中将<b>分辨率</b>设为 720p，这是 Seedance 接受的参考文件分辨率。
+            此设置会应用到视频、静帧和动态分镜。
           </>
         )
       },
       {
-        q: 'How do I export just one frame?',
+        q: '如何只导出一帧？',
         a: (
           <>
-            Scrub to the exact moment and click <b>📸 Export this frame</b> — it saves that single
-            frame as a full-quality PNG.
+            将播放头移到所需时刻，点击<b>📸 导出当前帧</b>，即可将这一帧保存为全画质 PNG。
           </>
         )
       },
       {
-        q: 'How do I control whether labels show in the export?',
+        q: '如何控制导出画面中的标签？',
         a: (
           <>
-            Choose whether labels burn into the video, appear only in stills (the default), or stay
-            out entirely — right in the Deliver panel.
+            在交付面板中选择标签显示方式：直接叠加到视频、仅显示在静帧中（默认），或完全隐藏。
           </>
         )
       },
       {
-        q: 'How do I stitch all my shots into one video?',
+        q: '如何将所有镜头拼成一个视频？',
         a: (
           <>
-            <b>Animatic</b> stitches every shot in the scene into one video; <b>Contact sheet</b>{' '}
-            makes a storyboard grid.
+            <b>动态分镜</b>会将当前场景的所有镜头拼接为一个视频；<b>分镜总览</b>会生成分镜网格图。
           </>
         )
       },
       {
-        q: 'How do I take the blocking into Blender?',
+        q: '如何将走位导入 Blender？',
         a: (
           <>
-            <b>Export to Blender</b> writes a .glb with the animated camera and blocking, plus a
-            one-click import script.
+            <b>导出到 Blender</b>会生成包含摄影机动画和角色走位的 .glb 文件，并附上一键导入脚本。
           </>
         )
       }
     ]
   },
   {
-    area: 'Projects',
+    area: '项目',
     items: [
       {
-        q: 'How do I save a set to reuse in another project?',
+        q: '如何保存布景以便在其他项目中复用？',
         a: (
           <>
-            <b>Stage Presets</b> save the current staging (set + characters + blocking) globally.
-            Stage it as a fresh scene in any project; the original never changes.
+            <b>场景预设</b>会全局保存当前的布景、角色和走位。
+            可在任意项目中将其作为新场景使用，原场景不会改变。
           </>
         )
       },
       {
-        q: 'How do I shoot the same action from another angle?',
+        q: '如何从另一角度拍摄同一段动作？',
         a: (
           <>
-            The scene owns the blocking and each shot owns its own camera, so make a{' '}
-            <b>new shot</b> and just reframe — no need to redo the moves.
+            角色走位属于场景，每个镜头都有自己的摄影机。因此只需<b>新建镜头</b>并重新构图，
+            无须再次编排动作。
           </>
         )
       },
       {
-        q: 'How do I recover work after a crash?',
+        q: '如何在崩溃后恢复内容？',
         a: (
           <>
-            A backup autosaves every minute; after a crash, <b>Open Project</b> restores the
-            unsaved work. A project is just a folder of readable JSON, safe to back up or git.
+            应用每分钟自动保存一次备份。崩溃后使用<b>打开项目</b>可恢复未保存的内容。
+            项目是包含可读 JSON 文件的文件夹，可自行备份或使用 Git 管理。
           </>
         )
       },
       {
-        q: 'How do I let an AI agent drive the app?',
+        q: '如何让 AI 智能体操控应用？',
         a: (
           <>
-            Register <b>mcp/blockout-mcp.mjs</b> with Claude Code, Codex, or Hermes — the agent can
-            stage scenes, frame shots, and screenshot the viewport. See AGENTS.md.
+            在 Claude Code、Codex 或 Hermes 中注册 <b>mcp/blockout-mcp.mjs</b>，
+            智能体即可搭建场景、调整构图并截取视口画面。详见 AGENTS.md。
           </>
         )
       }
@@ -507,20 +499,20 @@ const TASKS: { area: string; items: Task[] }[] = [
 /* ------------------------------- Shortcuts -------------------------------- */
 
 const SHORTCUTS: [string, string][] = [
-  ['Space', 'Play / pause the shot'],
-  ['M', 'Drop marks for the selection (click the floor)'],
-  ['C', 'Look through the shot camera'],
-  ['G / R', 'Gizmo: move / rotate'],
-  ['⇧-click', 'Multi-select entities, or marks on the timeline'],
-  [`${MOD}A / ⇧${MOD}A`, 'Select all marks in the shot / in the current lane'],
-  [`${MOD}D`, 'Duplicate selection'],
-  ['⌫', 'Delete selection (all of a multi-selection)'],
-  [`${MOD}Z / ⇧${MOD}Z`, 'Undo / redo — every action is undoable'],
-  [`${MOD}S`, 'Save project'],
-  ['1–9', 'Jump to camera mark N'],
-  [`${ALT}-click`, 'Place multiple copies while staging'],
-  ['Esc', 'Cancel placement / mark-dropping / selection'],
-  ['?', 'Open this help']
+  ['Space', '播放／暂停镜头'],
+  ['M', '为所选对象放置走位点（点击地面）'],
+  ['C', '切换到镜头摄影机视角'],
+  ['G / R', '操控器：移动／旋转'],
+  ['⇧-点击', '多选物体或时间线上的走位点'],
+  [`${MOD}A / ⇧${MOD}A`, '选择镜头内／当前轨道的所有走位点'],
+  [`${MOD}D`, '复制所选对象'],
+  ['⌫', '删除所选对象（包括多选的全部对象）'],
+  [`${MOD}Z / ⇧${MOD}Z`, '撤销／重做，所有操作均可撤销'],
+  [`${MOD}S`, '保存项目'],
+  ['1–9', '跳到对应编号的摄影机走位点'],
+  [`${ALT}-点击`, '布景时连续放置多个副本'],
+  ['Esc', '取消放置、设置走位点或当前选择'],
+  ['?', '打开帮助']
 ]
 
 /* --------------------------- Blocking coach ------------------------------ */
@@ -532,12 +524,12 @@ interface CoachStep {
 }
 
 const COACH_STEPS: CoachStep[] = [
-  { key: 'select', label: 'Select an actor or vehicle', hint: 'Click a character in the viewport.' },
-  { key: 'mark1', label: 'Press M and drop the first mark', hint: 'M, then click the floor where they start.' },
-  { key: 'mark2', label: 'Drop a second mark', hint: 'Click again further along — they walk between marks.' },
-  { key: 'play', label: 'Press Space to watch it walk', hint: 'Space plays the shot; the path ribbon shows the route.' },
-  { key: 'record', label: 'Try ⏺ Record to puppeteer', hint: 'Record camera or performance from the Take bar.' },
-  { key: 'export', label: 'Open DELIVER to export', hint: 'Switch to Deliver for the reference package.' }
+  { key: 'select', label: '选择演员或车辆', hint: '点击视口中的角色。' },
+  { key: 'mark1', label: '按 M 放置第一个走位点', hint: '按 M，再点击地面上的起始位置。' },
+  { key: 'mark2', label: '放置第二个走位点', hint: '点击更远处，角色会在两个走位点之间行走。' },
+  { key: 'play', label: '按 Space 查看行走效果', hint: '按空格键播放镜头，路径线会显示行进路线。' },
+  { key: 'record', label: '尝试 ⏺ 录制并直接操控', hint: '从拍摄控制栏录制摄影机或表演。' },
+  { key: 'export', label: '打开交付面板导出', hint: '切换到交付模式，生成动态参考包。' }
 ]
 
 /**
@@ -595,9 +587,9 @@ export function BlockingCoach(): JSX.Element | null {
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
         <span style={{ fontSize: 15 }}>🎯</span>
-        <b style={{ fontSize: 13 }}>Set your marks</b>
+        <b style={{ fontSize: 13 }}>设置走位点</b>
         <span style={{ flex: 1 }} />
-        <button className="btn small" style={{ padding: '2px 8px' }} onClick={() => setOpen(false)} title="Dismiss (re-open from Help)">
+        <button className="btn small" style={{ padding: '2px 8px' }} onClick={() => setOpen(false)} title="关闭（可从帮助中重新打开）">
           ✕
         </button>
       </div>
@@ -620,7 +612,7 @@ export function BlockingCoach(): JSX.Element | null {
       </div>
       {allDone && (
         <div style={{ marginTop: 10, fontSize: 12, color: 'var(--success, #46a758)' }}>
-          That&apos;s the whole loop — nice. Close this any time.
+          已完成全部流程，可以随时关闭引导。
         </div>
       )}
     </div>
@@ -663,21 +655,21 @@ export function HelpOverlay(): JSX.Element | null {
               className={tab === 'quickstart' ? 'active' : ''}
               onClick={() => setTab('quickstart')}
             >
-              Quick start
+              快速入门
             </button>
             <button className={tab === 'tasks' ? 'active' : ''} onClick={() => setTab('tasks')}>
-              How do I…?
+              常见操作
             </button>
             <button
               className={tab === 'shortcuts' ? 'active' : ''}
               onClick={() => setTab('shortcuts')}
             >
-              Shortcuts
+              快捷键
             </button>
           </div>
           <span style={{ flex: 1 }} />
           <button className="btn small" onClick={() => setHelpOpen(false)}>
-            Done
+            完成
           </button>
         </div>
 
@@ -685,9 +677,8 @@ export function HelpOverlay(): JSX.Element | null {
           {tab === 'quickstart' && (
             <div className="help-v4-inner">
               <p className="help-intro">
-                The whole app is three verbs: <b>STAGE</b> the scene, <b>SHOOT</b> the motion,{' '}
-                <b>DELIVER</b> the reference package to your AI generator. Here&apos;s the whole
-                thing at a glance.
+                应用的工作流程分为三步：<b>布景</b>搭建场景，<b>拍摄</b>编排运动，
+                <b>交付</b>为 AI 视频生成工具导出参考包。下面带你快速了解整个流程。
               </p>
               <div className="help-cards">
                 {CARDS.map((c) => (
@@ -706,12 +697,12 @@ export function HelpOverlay(): JSX.Element | null {
                     setCoachOpen(true)
                     setHelpOpen(false)
                   }}
-                  title="Open the Set your marks interactive walkthrough"
+                  title="打开“设置走位点”交互引导"
                 >
-                  🎯 Start the “Set your marks” coach
+                  🎯 开始“设置走位点”引导
                 </button>
                 <span style={{ fontSize: 12, color: 'var(--text-faint)' }}>
-                  A checklist that ticks itself off as you block your first move.
+                  编排第一个动作时，清单会自动勾选已完成的步骤。
                 </span>
               </div>
             </div>
@@ -722,13 +713,13 @@ export function HelpOverlay(): JSX.Element | null {
               <input
                 className="help-search"
                 type="text"
-                placeholder="Search tasks — e.g. “fight”, “track a plane”, “720p”…"
+                placeholder="搜索操作，例如“打斗”“跟踪飞机”“720p”…"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 autoFocus
               />
               {filtered.length === 0 ? (
-                <p className="help-empty">No tasks match “{query}”.</p>
+                <p className="help-empty">未找到与“{query}”匹配的操作。</p>
               ) : (
                 filtered.map((group) => (
                   <div key={group.area} className="help-task-group">
@@ -747,7 +738,7 @@ export function HelpOverlay(): JSX.Element | null {
 
           {tab === 'shortcuts' && (
             <div className="help-v4-inner">
-              <p className="help-intro">Keyboard shortcuts — every action is undoable.</p>
+              <p className="help-intro">键盘快捷键：所有操作均可撤销。</p>
               <div className="help-kbd-grid">
                 {SHORTCUTS.map(([key, desc]) => (
                   <div key={key} className="help-kbd-row">

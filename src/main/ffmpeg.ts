@@ -45,7 +45,7 @@ export async function resolveFfmpeg(): Promise<string> {
 
 export function friendlyFfmpegError(error: unknown): string {
   if (/ENOENT/i.test(String(error))) {
-    return 'FFmpeg is unavailable. Reinstall Blockout or set BLOCKOUT_FFMPEG to a valid executable.'
+    return 'FFmpeg 不可用。请重新安装 Blockout，或将 BLOCKOUT_FFMPEG 设置为有效的可执行文件路径。'
   }
   return error instanceof Error ? error.message : String(error)
 }
@@ -100,6 +100,6 @@ export async function terminateProcessTree(child: ChildProcess): Promise<void> {
     // A final close may already be queued.
   }
   if (!(await closesWithin(closed, 5_000))) {
-    throw new Error('FFmpeg did not close after process-tree termination.')
+    throw new Error('终止进程树后，FFmpeg 仍未退出。')
   }
 }

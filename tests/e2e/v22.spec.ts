@@ -22,7 +22,7 @@ test.beforeAll(async () => {
   })
   page = await app.firstWindow()
   await page.waitForLoadState('domcontentloaded')
-  await page.getByRole('button', { name: 'New Project' }).click()
+  await page.getByRole('button', { name: '新建项目' }).click()
   await page.waitForTimeout(400)
 })
 
@@ -33,9 +33,9 @@ test.afterAll(async () => {
 test('sequences UI stages a choreographed dance crowd in one click', async () => {
   // Drive the actual Library UI: set 10 performers, arm placement, click the
   // floor (v4: sequences stage exactly where you click).
-  const seqBox = page.locator('.panel-section', { hasText: 'Sequences' }).first()
+  const seqBox = page.locator('.panel-section', { hasText: '群体动作' }).first()
   await seqBox.locator('input[type="number"]').fill('10')
-  await page.getByRole('button', { name: /Stage 10 performers/ }).click()
+  await page.getByRole('button', { name: /布置 10 位表演者/ }).click()
   const canvas = page.locator('.viewport-wrap canvas')
   const box = (await canvas.boundingBox())!
   await page.mouse.click(box.x + box.width / 2, box.y + box.height * 0.62)
@@ -99,9 +99,9 @@ test('action preset: plane takeoff lays an altitude path from the pose', async (
     store.setSelection({ kind: 'entity', entityId: id })
   }, result.plane)
   await page.waitForTimeout(200)
-  const combo = page.locator('select', { has: page.locator('option', { hasText: 'Plane Takeoff' }) }).first()
-  await combo.selectOption({ label: 'Plane Takeoff' })
-  await page.getByRole('button', { name: 'Apply action' }).click()
+  const combo = page.locator('select', { has: page.locator('option', { hasText: '飞机起飞' }) }).first()
+  await combo.selectOption({ label: '飞机起飞' })
+  await page.getByRole('button', { name: '应用路径', exact: true }).click()
   await page.waitForTimeout(200)
   const marks = await page.evaluate((id: string) => {
     const s = (window as any).__blockout.store.getState()

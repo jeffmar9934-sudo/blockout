@@ -128,10 +128,10 @@ async function extractFrame(videoPath: string): Promise<string> {
     child.stderr?.resume()
     child.once('close', (code) => {
       if (code === 0) resolve()
-      else reject(new Error('FFmpeg could not extract a frame from the reference video. Check that the file is readable and uses a supported codec.'))
+      else reject(new Error('FFmpeg 无法从参考视频提取画面。请检查文件是否可读，并使用支持的编码格式。'))
     })
     child.once('error', (error) => {
-      reject(new Error(`Could not analyze the reference video: ${friendlyFfmpegError(error)}`))
+      reject(new Error(`无法分析参考视频：${friendlyFfmpegError(error)}`))
     })
   })
   return out
@@ -154,9 +154,9 @@ async function resolveApiKey(): Promise<string | undefined> {
 }
 
 const AUTH_HELP =
-  'Claude API authentication failed. Either: (1) run `ant auth login` in a terminal, ' +
-  `(2) save your key to ${resolveConfigPath('anthropic-api-key')}, or ` +
-  '(3) launch Blockout from a terminal with ANTHROPIC_API_KEY set.'
+  'Claude API 身份验证失败。请选择一种方式：(1) 在终端运行 `ant auth login`；' +
+  `(2) 将密钥保存到 ${resolveConfigPath('anthropic-api-key')}；或 ` +
+  '(3) 在终端设置 ANTHROPIC_API_KEY 后启动 Blockout。'
 
 export async function analyzeReference(filePath: string): Promise<AnalyzeResult> {
   let imagePath = filePath
@@ -168,11 +168,11 @@ export async function analyzeReference(filePath: string): Promise<AnalyzeResult>
       imagePath = extractedFrame
     }
     const mediaType = MEDIA_TYPES[extname(imagePath).toLowerCase()]
-    if (!mediaType) return { ok: false, error: `Unsupported file type: ${ext}` }
+    if (!mediaType) return { ok: false, error: `不支持的文件类型：${ext}` }
 
     const bytes = await readFile(imagePath)
     if (bytes.byteLength > 20 * 1024 * 1024) {
-      return { ok: false, error: 'Image is larger than 20MB — please use a smaller reference.' }
+      return { ok: false, error: '图片超过 20 MB，请使用更小的参考图片。' }
     }
     const data = bytes.toString('base64')
 
@@ -201,15 +201,15 @@ export async function analyzeReference(filePath: string): Promise<AnalyzeResult>
     })
 
     if (response.stop_reason === 'refusal') {
-      return { ok: false, error: 'The model declined to analyze this image.' }
+      return { ok: false, error: '模型拒绝分析此图片。' }
     }
     const text = response.content.find((b) => b.type === 'text')
     if (!text || text.type !== 'text') {
-      return { ok: false, error: 'No layout returned — try a clearer reference image.' }
+      return { ok: false, error: '未返回场景布局，请尝试更清晰的参考图片。' }
     }
     const layout = JSON.parse(text.text) as AnalyzedLayout
     if (!Array.isArray(layout.entities) || layout.entities.length === 0) {
-      return { ok: false, error: 'The model found nothing stageable in this reference.' }
+      return { ok: false, error: '模型未在参考图片中找到可布置的元素。' }
     }
     return { ok: true, layout }
   } catch (e) {
@@ -221,7 +221,7 @@ export async function analyzeReference(filePath: string): Promise<AnalyzeResult>
       return { ok: false, error: AUTH_HELP }
     }
     if (e instanceof Anthropic.APIError) {
-      return { ok: false, error: `Claude API error: ${e.message}` }
+      return { ok: false, error: `Claude API 错误：${e.message}` }
     }
     return { ok: false, error: e instanceof Error ? e.message : String(e) }
   } finally {

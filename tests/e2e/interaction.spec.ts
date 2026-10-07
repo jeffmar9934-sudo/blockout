@@ -15,11 +15,11 @@ test.beforeAll(async () => {
   const dir = mkdtempSync(join(tmpdir(), 'blockout-interact-'))
   app = await electron.launch({
     args: ['out/main/index.js'],
-    env: { ...process.env, BLOCKOUT_SMOKE_DIR: dir }
+    env: { ...process.env, BLOCKOUT_SMOKE_DIR: dir, BLOCKOUT_CONFIG_DIR: join(dir, 'config') }
   })
   page = await app.firstWindow()
   await page.waitForLoadState('domcontentloaded')
-  await page.getByRole('button', { name: 'New Project' }).click()
+  await page.getByRole('button', { name: '新建项目' }).click()
   await page.waitForTimeout(400)
 })
 
@@ -91,11 +91,11 @@ test('PiP preview reports a rect and can be resized/hidden', async () => {
     store.setPipSize('medium')
   })
   await page.waitForTimeout(400)
-  await expect(page.getByText('SHOT PREVIEW')).toBeVisible()
+  await expect(page.getByText('镜头预览')).toBeVisible()
   await page.evaluate(() => (window as any).__blockout.store.getState().setPipSize('off'))
   await page.waitForTimeout(300)
-  await expect(page.getByText('SHOT PREVIEW')).not.toBeVisible()
-  await expect(page.getByRole('button', { name: '🎥 Preview' })).toBeVisible()
+  await expect(page.getByText('镜头预览')).not.toBeVisible()
+  await expect(page.getByRole('button', { name: '🎥 预览' })).toBeVisible()
   await page.evaluate(() => (window as any).__blockout.store.getState().setPipSize('medium'))
 })
 
@@ -107,7 +107,7 @@ test('camera-move recording converts flight into camera marks', async () => {
     store.setSelection({ kind: 'camera' })
     return store.shot().camera.marks.length
   })
-  await page.getByRole('button', { name: '● Record camera' }).click()
+  await page.getByRole('button', { name: '● 录制摄影机' }).click()
   // Fly: orbit-drag the viewport for ~1.5s
   const canvas = page.locator('.viewport-wrap canvas')
   const box = (await canvas.boundingBox())!
@@ -121,7 +121,7 @@ test('camera-move recording converts flight into camera marks', async () => {
   }
   await page.mouse.up()
   await page.waitForTimeout(300)
-  await page.getByRole('button', { name: '■ Stop', exact: true }).click()
+  await page.getByRole('button', { name: '■ 停止', exact: true }).click()
   await page.waitForTimeout(400)
   const after = await page.evaluate(() => {
     const store = (window as any).__blockout.store.getState()
@@ -219,7 +219,7 @@ test('pose-per-mark: joints on marks flow through the store and evaluator', asyn
 
 test('credits with site links render in-app', async () => {
   await page.evaluate(() => (window as any).__blockout.store.getState().setMode('stage'))
-  await expect(page.getByText('Created by Sam Wasserman')).toBeVisible()
+  await expect(page.getByText('由 Sam Wasserman 创作')).toBeVisible()
   await expect(page.getByText('wassermanproductions.com')).toBeVisible()
   await expect(page.getByText('wasserman.ai')).toBeVisible()
 })

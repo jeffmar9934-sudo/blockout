@@ -30,7 +30,7 @@ test.afterAll(async () => {
 
 test('cancel waits for FFmpeg and removes the partial output without a file lock', async () => {
   test.setTimeout(120_000)
-  await page.getByRole('button', { name: 'New Project' }).click()
+  await page.getByRole('button', { name: '新建项目' }).click()
   // First project creation initializes the full GL scene; CI's GPU-less Intel runners need well over the default 5s.
   await expect(page.locator('.mode-switch')).toBeVisible({ timeout: 30_000 })
   await page.waitForTimeout(300)

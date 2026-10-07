@@ -138,12 +138,12 @@ test.beforeAll(async () => {
   const smokeDir = mkdtempSync(join(tmpdir(), 'blockout-readme-'))
   app = await electron.launch({
     args: ['out/main/index.js'],
-    env: { ...process.env, BLOCKOUT_SMOKE_DIR: smokeDir }
+    env: { ...process.env, BLOCKOUT_SMOKE_DIR: smokeDir, BLOCKOUT_CONFIG_DIR: join(smokeDir, 'config') }
   })
   page = await app.firstWindow()
   await page.setViewportSize({ width: 1600, height: 1000 }).catch(() => {})
   await page.waitForLoadState('domcontentloaded')
-  await page.getByRole('button', { name: 'New Project' }).click()
+  await page.getByRole('button', { name: '新建项目' }).click()
   await page.waitForTimeout(700)
 })
 

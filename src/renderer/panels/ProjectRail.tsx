@@ -67,7 +67,7 @@ export function ProjectRail(): JSX.Element {
 
   const deleteScene = (scene: Scene): void => {
     if (doc.scenes.length <= 1) {
-      toast('A project needs at least one scene.', 'error')
+      toast('项目至少需要一个场景。', 'error')
       return
     }
     const wasCurrent = scene.id === sceneId
@@ -93,7 +93,7 @@ export function ProjectRail(): JSX.Element {
 
   const deleteShot = (scene: Scene, shot: Shot): void => {
     if (scene.shots.length <= 1) {
-      toast('A scene needs at least one shot.', 'error')
+      toast('场景至少需要一个镜头。', 'error')
       return
     }
     const wasCurrent = shot.id === shotId
@@ -112,10 +112,10 @@ export function ProjectRail(): JSX.Element {
     <div className="panel-section">
       <div className="rail-header">
         <div className="panel-title" style={{ marginBottom: 0 }}>
-          Scenes &amp; Shots
+          场景与镜头
         </div>
         <button className="btn small" onClick={() => addSceneAfter()}>
-          + Scene
+          + 场景
         </button>
       </div>
 
@@ -150,12 +150,12 @@ export function ProjectRail(): JSX.Element {
               ) : (
                 <>
                   <span className="rail-label">
-                    Scene {scene.number} — {scene.name}
+                    场景 {scene.number} — {scene.name}
                   </span>
                   <span className="rail-actions">
                     <button
                       className="rail-btn"
-                      title="Add shot"
+                      title="添加镜头"
                       onClick={(e) => {
                         e.stopPropagation()
                         addShotToScene(scene.id)
@@ -165,7 +165,7 @@ export function ProjectRail(): JSX.Element {
                     </button>
                     <button
                       className="rail-btn"
-                      title="Delete scene"
+                      title="删除场景"
                       onClick={(e) => {
                         e.stopPropagation()
                         deleteScene(scene)
@@ -211,23 +211,23 @@ export function ProjectRail(): JSX.Element {
                       ) : (
                         <>
                           <span className="rail-label">{shot.name}</span>
-                          <span className="rail-dur">{Math.round(shot.duration)}s</span>
+                          <span className="rail-dur">{Math.round(shot.duration)}秒</span>
                           <span className="rail-actions">
                             {isCurrentShot && (
                               <button
                                 className="rail-btn"
-                                title="Save current shot as a draft"
+                                title="将当前镜头保存为草稿"
                                 onClick={(e) => {
                                   e.stopPropagation()
                                   saveDraftOfShot()
                                 }}
                               >
-                                + Draft
+                                + 草稿
                               </button>
                             )}
                             <button
                               className="rail-btn"
-                              title="Duplicate shot"
+                              title="复制镜头"
                               onClick={(e) => {
                                 e.stopPropagation()
                                 duplicateShot(scene, shot)
@@ -237,7 +237,7 @@ export function ProjectRail(): JSX.Element {
                             </button>
                             <button
                               className="rail-btn"
-                              title="Delete shot"
+                              title="删除镜头"
                               onClick={(e) => {
                                 e.stopPropagation()
                                 deleteShot(scene, shot)
@@ -262,7 +262,7 @@ export function ProjectRail(): JSX.Element {
                           <span className="rail-actions">
                             <button
                               className="rail-btn"
-                              title="Make this the shot"
+                              title="将此草稿设为正式镜头"
                               onClick={(e) => {
                                 e.stopPropagation()
                                 promoteDraft(draft.id)
@@ -272,7 +272,7 @@ export function ProjectRail(): JSX.Element {
                             </button>
                             <button
                               className="rail-btn"
-                              title="Delete draft"
+                              title="删除草稿"
                               onClick={(e) => {
                                 e.stopPropagation()
                                 deleteDraft(draft.id)

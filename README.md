@@ -1,5 +1,7 @@
 <!-- Modified for cross-platform Windows support in 2026; see MODIFICATIONS.md. -->
 
+**简体中文版：[中文说明与 Windows 下载](README.zh-CN.md)。**
+
 <div align="center">
 
 <img src="docs/images/logo.png" alt="Blockout logo" width="340" />
@@ -120,10 +122,11 @@ security warnings:
 curl -fsSL https://raw.githubusercontent.com/wassermanproductions/blockout/main/install.sh | bash
 ```
 
-**Windows — download** the Windows 11 x64 installer from
-[GitHub Releases](https://github.com/wassermanproductions/blockout/releases).
-You can also grab the macOS DMG there, or build from source — see the note
-about unsigned builds below.
+**Windows — Simplified Chinese build:** download the installer or standalone ZIP
+from a successful [Chinese Windows workflow run](https://github.com/jeffmar9934-sudo/blockout/actions/workflows/windows-zh-release.yml).
+See [local deployment instructions](docs/DEPLOY-WINDOWS.zh-CN.md) for artifacts,
+draft Release access, checksums and unsigned-build details. Original upstream
+macOS releases remain available at [upstream GitHub Releases](https://github.com/wassermanproductions/blockout/releases).
 
 **Linux — build from source**: see [docs/INSTALL-linux.md](docs/INSTALL-linux.md)
 (Mint / Ubuntu 24.04+ steps and troubleshooting, contributed by

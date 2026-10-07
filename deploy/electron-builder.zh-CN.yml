@@ -1,0 +1,33 @@
+# Simplified Chinese local Windows distribution; see MODIFICATIONS.md.
+extends: ./electron-builder.yml
+appId: com.blockout.zhcn
+productName: Blockout 简体中文版
+artifactName: Blockout-zh-CN-${version}-win-${arch}.${ext}
+win:
+  signExecutable: false
+  target:
+    - target: nsis
+      arch: [x64]
+    - target: zip
+      arch: [x64]
+  extraResources:
+    - from: vendor/ffmpeg/win-x64/ffmpeg.exe
+      to: ffmpeg/ffmpeg.exe
+    - from: vendor/ffmpeg/win-x64/ffprobe.exe
+      to: ffmpeg/ffprobe.exe
+    - from: vendor/ffmpeg/win-x64/LICENSE.txt
+      to: licenses/FFmpeg-GPL-3.0.txt
+    - from: third_party/ffmpeg/PROVENANCE.md
+      to: ffmpeg/PROVENANCE.md
+    - from: release/ffmpeg-corresponding-source
+      to: ffmpeg-source/archives
+    - from: docs/DEPLOY-WINDOWS.zh-CN.md
+      to: 本地部署说明.md
+nsis:
+  artifactName: Blockout-zh-CN-${version}-win-${arch}-Setup.${ext}
+  shortcutName: Blockout 简体中文版
+  uninstallDisplayName: Blockout 简体中文版
+  installerLanguages:
+    - zh_CN
+  language: '2052'
+  displayLanguageSelector: false

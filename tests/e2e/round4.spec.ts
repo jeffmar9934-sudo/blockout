@@ -23,7 +23,7 @@ test.beforeAll(async () => {
   })
   page = await app.firstWindow()
   await page.waitForLoadState('domcontentloaded')
-  await page.getByRole('button', { name: 'New Project' }).click()
+  await page.getByRole('button', { name: '新建项目' }).click()
   await page.waitForTimeout(400)
 })
 
@@ -130,8 +130,8 @@ test('motion preset apply lays down pose marks at the playhead', async () => {
     return { id }
   })
   // Drive the actual UI: entity inspector → Motion presets → Apply.
-  await page.getByRole('button', { name: 'Fight' }).click()
-  await page.getByRole('button', { name: 'Apply' }).first().click()
+  await page.getByRole('button', { name: '打斗', exact: true }).click()
+  await page.getByRole('button', { name: '应用', exact: true }).first().click()
   const marks = await page.evaluate((id: string) => {
     const s = (window as any).__blockout.store.getState()
     const take = s.scene().blocking.find((b: any) => b.id === s.shot().blockingTakeId)

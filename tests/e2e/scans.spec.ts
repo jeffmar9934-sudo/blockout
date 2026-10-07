@@ -48,11 +48,11 @@ test.beforeAll(async () => {
   makeSyntheticSplat(splatPath)
   app = await electron.launch({
     args: ['out/main/index.js'],
-    env: { ...process.env, BLOCKOUT_SMOKE_DIR: smokeDir }
+    env: { ...process.env, BLOCKOUT_SMOKE_DIR: smokeDir, BLOCKOUT_CONFIG_DIR: join(smokeDir, 'config') }
   })
   page = await app.firstWindow()
   await page.waitForLoadState('domcontentloaded')
-  await page.getByRole('button', { name: 'New Project' }).click()
+  await page.getByRole('button', { name: '新建项目' }).click()
   await expect(page.locator('.mode-switch')).toBeVisible()
 })
 
@@ -103,7 +103,7 @@ test('scan transforms + visibility edit and the app stays responsive', async () 
 })
 
 test('scans persist through save and reload-parse', async () => {
-  await page.getByRole('button', { name: 'Save', exact: true }).click()
+  await page.getByRole('button', { name: '保存', exact: true }).click()
   await page.waitForTimeout(300)
   const projectFile = join(smokeDir, 'Smoke.blockout', 'project.json')
   expect(existsSync(projectFile)).toBe(true)
@@ -123,6 +123,6 @@ test('removeScan detaches the ref and the viewport survives', async () => {
   })
   expect(remaining).toBe(0)
   // Still responsive: mode switch works after the splat teardown.
-  await page.locator('.mode-switch button', { hasText: 'SHOOT' }).click()
+  await page.locator('.mode-switch button', { hasText: '拍摄' }).click()
   await expect(page.locator('.timeline')).toBeVisible()
 })

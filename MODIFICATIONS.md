@@ -18,6 +18,15 @@ Portable desktop work added in 2026, contributed by
 Downstream distributors should append their own branding and behavioral changes
 to this file rather than replacing the original attribution.
 
+Simplified Chinese local version added on 2026-10-06:
+
+- Fixed Simplified Chinese UI, tutorials, dialogs, notifications and export instructions.
+- Display-only translations for built-in catalogs with Chinese and English search; engine IDs and AI prompt metadata remain unchanged.
+- Chinese fonts, Chinese workflow tests, and Chinese defaults for newly created scenes.
+- Windows x64 local deployment helpers, Chinese NSIS installer settings, an unpacked ZIP target, and a separate `com.blockout.zhcn` / `blockout-zh-cn` configuration identity.
+- Windows-native GitHub Actions builds, validates and retains Chinese installation/ZIP artifacts, and uploads only missing SHA256-matched assets to the existing draft Release.
+- Original source attribution, license notices and fixed FFmpeg integrity checks remain in the local packages. Modified UI, main-process and test files are identified by this change notice; JSON metadata and engine files remain unchanged.
+
 Every upstream file changed by this port and capable of carrying comments has
 a prominent first-lines notice pointing back to this manifest. The following
 changed structured/generated files cannot accept comments without invalidating

@@ -4,20 +4,21 @@
  */
 
 import { useStore } from '../store'
+import { zh } from '../i18n/zh-CN'
 
 export function Toasts(): JSX.Element {
   const toasts = useStore((s) => s.toasts)
   const dismissToast = useStore((s) => s.dismissToast)
 
   return (
-    <div className="toasts">
+    <div className="toasts" aria-label="通知">
       {toasts.map((t) => (
         <div
           key={t.id}
           className={`toast ${t.kind}`}
           onClick={() => dismissToast(t.id)}
         >
-          {t.text}
+          {zh(t.text)}
         </div>
       ))}
     </div>

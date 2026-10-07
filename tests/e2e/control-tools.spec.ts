@@ -9,7 +9,7 @@
 
 import { _electron as electron, test, expect, type ElectronApplication, type Page } from '@playwright/test'
 import { mkdtempSync, writeFileSync, existsSync } from 'fs'
-import { tmpdir, homedir } from 'os'
+import { tmpdir } from 'os'
 import { join } from 'path'
 
 let app: ElectronApplication
@@ -61,15 +61,15 @@ test.beforeAll(async () => {
 
   app = await electron.launch({
     args: ['out/main/index.js'],
-    env: { ...process.env, BLOCKOUT_SMOKE_DIR: smokeDir }
+    env: { ...process.env, BLOCKOUT_SMOKE_DIR: smokeDir, BLOCKOUT_CONFIG_DIR: join(smokeDir, 'config') }
   })
   page = await app.firstWindow()
   await page.waitForLoadState('domcontentloaded')
-  await page.getByRole('button', { name: 'New Project' }).click()
+  await page.getByRole('button', { name: '新建项目' }).click()
   await expect(page.locator('.mode-switch')).toBeVisible()
 
   const { readFileSync } = await import('fs')
-  const discoveryFile = join(homedir(), '.config', 'blockout', 'control.json')
+  const discoveryFile = join(smokeDir, 'config', 'control.json')
   expect(existsSync(discoveryFile)).toBe(true)
   ;({ port, token } = JSON.parse(readFileSync(discoveryFile, 'utf-8')) as { port: number; token: string })
 })

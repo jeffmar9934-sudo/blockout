@@ -16,11 +16,11 @@ test.beforeAll(async () => {
   smokeDir = mkdtempSync(join(tmpdir(), 'blockout-v23-'))
   app = await electron.launch({
     args: ['out/main/index.js'],
-    env: { ...process.env, BLOCKOUT_SMOKE_DIR: smokeDir }
+    env: { ...process.env, BLOCKOUT_SMOKE_DIR: smokeDir, BLOCKOUT_CONFIG_DIR: join(smokeDir, 'config') }
   })
   page = await app.firstWindow()
   await page.waitForLoadState('domcontentloaded')
-  await page.getByRole('button', { name: 'New Project' }).click()
+  await page.getByRole('button', { name: '新建项目' }).click()
   await page.waitForTimeout(400)
 })
 
@@ -37,13 +37,13 @@ test('camera tab pins camera controls regardless of selection', async () => {
   })
   await page.waitForTimeout(200)
   // With an ENTITY selected, pin the camera tab — camera controls appear.
-  await page.getByRole('button', { name: '🎥 Camera' }).click()
-  await expect(page.getByText('Position & aim')).toBeVisible()
-  await expect(page.getByText('Track subject')).toBeVisible()
-  await expect(page.getByText('Camera moves')).toBeVisible()
+  await page.getByRole('button', { name: '🎥 摄影机' }).click()
+  await expect(page.getByText('位置与朝向')).toBeVisible()
+  await expect(page.getByText('跟踪主体')).toBeVisible()
+  await expect(page.getByText('运镜预设')).toBeVisible()
   // Back to selection view.
-  await page.getByRole('button', { name: 'Selection', exact: true }).click()
-  await expect(page.getByText('Motion presets')).toBeVisible()
+  await page.getByRole('button', { name: '当前选择', exact: true }).click()
+  await expect(page.getByText('动作预设')).toBeVisible()
 })
 
 test('numeric camera pose fields edit the active mark', async () => {
@@ -53,7 +53,7 @@ test('numeric camera pose fields edit the active mark', async () => {
     return (window as any).__blockout.store.getState().shot().camera.marks[0].position
   })
   expect(before.x).toBeCloseTo(3, 3)
-  await page.getByRole('button', { name: '🎥 Camera' }).click()
+  await page.getByRole('button', { name: '🎥 摄影机' }).click()
   await page.waitForTimeout(150)
   const xField = page.locator('.field', { hasText: 'X' }).locator('input').first()
   await xField.fill('7.5')

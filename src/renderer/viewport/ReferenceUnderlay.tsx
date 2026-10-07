@@ -103,7 +103,7 @@ export function ReferenceControls(): JSX.Element | null {
   const attach = async (): Promise<void> => {
     if (!folder) return
     const file = await window.blockout.pickFile([
-      { name: 'Videos', extensions: ['mp4', 'mov', 'webm', 'm4v'] }
+      { name: '视频', extensions: ['mp4', 'mov', 'webm', 'm4v'] }
     ])
     if (!file) return
     const imported = await window.blockout.importReference(folder, file)
@@ -114,17 +114,17 @@ export function ReferenceControls(): JSX.Element | null {
       }
     })
     setOpen(true)
-    toast('Reference attached — match your blocking against it.', 'success')
+    toast('已添加参考视频，可对照调整走位。', 'success')
   }
 
   return (
     <div style={{ position: 'relative' }}>
       <button
         className={`btn small ${ref ? 'active' : ''}`}
-        title="Reference video underlay — match an existing shot by eye"
+        title="参考视频叠层 · 对照已有镜头调整画面"
         onClick={() => (ref ? setOpen(!open) : void attach())}
       >
-        🎞 Ref
+        🎞 参考
       </button>
       {open && ref && (
         <div
@@ -141,7 +141,7 @@ export function ReferenceControls(): JSX.Element | null {
           }}
         >
           <div className="field">
-            <label>Opacity ({Math.round(ref.opacity * 100)}%)</label>
+            <label>不透明度（{Math.round(ref.opacity * 100)}%）</label>
             <input
               type="range"
               min={0.1}
@@ -159,7 +159,7 @@ export function ReferenceControls(): JSX.Element | null {
             />
           </div>
           <div className="field">
-            <label>Mode</label>
+            <label>模式</label>
             <div className="seg">
               {(['ghost', 'pip'] as const).map((m) => (
                 <button
@@ -174,13 +174,13 @@ export function ReferenceControls(): JSX.Element | null {
                     })
                   }
                 >
-                  {m === 'ghost' ? 'Ghost overlay' : 'PiP'}
+                  {m === 'ghost' ? '半透明叠加' : '画中画'}
                 </button>
               ))}
             </div>
           </div>
           <div className="field">
-            <label>Time offset ({ref.timeOffset.toFixed(1)}s)</label>
+            <label>时间偏移（{ref.timeOffset.toFixed(1)}秒）</label>
             <input
               type="range"
               min={-10}
@@ -210,7 +210,7 @@ export function ReferenceControls(): JSX.Element | null {
               setOpen(false)
             }}
           >
-            Remove reference
+            移除参考视频
           </button>
         </div>
       )}

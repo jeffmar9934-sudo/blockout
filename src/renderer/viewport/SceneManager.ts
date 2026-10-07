@@ -30,6 +30,7 @@ import { headingOf } from '@engine/path'
 import { CAMERA_MOVE_PRESETS } from '@engine/camera-moves'
 import type { Entity, LightingPresetId, Scene as DocScene, Shot } from '@engine/types'
 import { useStore, selectedEntityIds } from '../store'
+import { zh } from '../i18n/zh-CN'
 import { on } from '../bus'
 import { buildAsset, markMesh, labelSprite, type BuiltAsset } from './builders'
 
@@ -461,20 +462,20 @@ export class SceneManager {
       if (visual) visual.loading = false
       toast(message, 'error')
     }
-    if (!projectFolder) return fail('Scan load failed: no open project folder.')
+    if (!projectFolder) return fail('扫描加载失败：尚未打开项目文件夹。')
 
     const ext = file.toLowerCase().split('.').pop() ?? ''
     const format = { ply: SceneFormat.Ply, splat: SceneFormat.Splat, ksplat: SceneFormat.KSplat, spz: SceneFormat.Spz }[
       ext
     ]
-    if (format === undefined) return fail(`Scan format ".${ext}" is not supported (.ply/.splat/.ksplat/.spz).`)
+    if (format === undefined) return fail(`不支持扫描格式“.${ext}”（支持 .ply/.splat/.ksplat/.spz）。`)
 
     let url: string
     try {
       const buffer = await window.blockout.readProjectFile(projectFolder, file)
       url = URL.createObjectURL(new Blob([buffer]))
     } catch (e) {
-      return fail(`Scan load failed: ${(e as Error).message}`)
+      return fail(`扫描加载失败：${(e as Error).message}`)
     }
 
     const stale = (): boolean => {
@@ -513,7 +514,7 @@ export class SceneManager {
       settled = true
       URL.revokeObjectURL(url)
       Promise.resolve(viewer.dispose()).catch(() => undefined)
-      fail(`Scan load failed: ${e instanceof Error ? e.message : 'unreadable splat file'}`)
+      fail(`扫描加载失败：${e instanceof Error ? e.message : '无法读取点云文件'}`)
     }
     try {
       viewer.addSplatScene(url, { format, showLoadingUI: false, splatAlphaRemovalThreshold: 5 }).then(succeed, reject)
@@ -521,7 +522,7 @@ export class SceneManager {
       return reject(e)
     }
     window.setTimeout(() => {
-      if (!settled) reject(new Error('timed out after 90s'))
+      if (!settled) reject(new Error('等待 90 秒后超时'))
     }, 90_000)
   }
 
@@ -576,7 +577,7 @@ export class SceneManager {
         visual.customLoaded = true
       })
     } catch (e) {
-      useStore.getState().toast(`Could not load model: ${String(e)}`, 'error')
+      useStore.getState().toast(`无法加载模型：${String(e)}`, 'error')
     }
   }
 
@@ -1329,7 +1330,7 @@ export class SceneManager {
     const s = this.currentState()
     const ids = selectedEntityIds(s.selection)
     if (ids.length === 0) {
-      s.toast('Select something to snap to the ground first.', 'info')
+      s.toast('请先选择要贴地的对象。', 'info')
       return
     }
     const updates = new Map<string, number>()
@@ -1422,7 +1423,7 @@ export class SceneManager {
       subjectId = person?.id ?? this.docScene?.entities[0]?.id ?? null
     }
     if (!subjectId || !this.shot || !this.evaluator) {
-      s.toast('Place a subject first, then auto-frame.', 'info')
+      s.toast('请先放置主体，再自动构图。', 'info')
       return
     }
     const state = this.evaluator.evaluate(s.time)
@@ -1561,7 +1562,7 @@ export class SceneManager {
       camState.position.z
     )
     if (subjects.length === 0) {
-      s.toast('Place at least one character first.', 'info')
+      s.toast('请先放置至少一个角色。', 'info')
       return
     }
     const primary = subjects[0]!
@@ -1585,7 +1586,7 @@ export class SceneManager {
         mark ? mark.tilt : tilt,
         next
       )
-      s.toast(next === 0 ? 'Horizon level' : `Dutch ${next > 0 ? 'right' : 'left'}`, 'info')
+      s.toast(next === 0 ? '水平线已校正' : `向${next > 0 ? '右' : '左'}倾斜构图`, 'info')
       return
     }
 
@@ -1604,7 +1605,7 @@ export class SceneManager {
 
     if (kind === 'OTS') {
       if (subjects.length < 2) {
-        s.toast('Over-the-shoulder needs two characters — select both.', 'info')
+        s.toast('过肩镜头需要两个角色，请同时选中。', 'info')
         return
       }
       // Foreground shoulder = the subject closer to the current camera.
@@ -1661,7 +1662,7 @@ export class SceneManager {
     // 2S — group framing perpendicular to the pair (works for 3/4-shots too:
     // it fits however many subjects are selected).
     if (subjects.length < 2) {
-      s.toast('A two-shot needs two characters — select them first.', 'info')
+      s.toast('双人镜头需要两个角色，请先选中。', 'info')
       return
     }
     const a = subjects[0]!
@@ -1708,7 +1709,7 @@ export class SceneManager {
     const subjects = this.framingSubjects()
     const subject = subjects[0]
     if (!subject) {
-      s.toast('Place a subject first — camera moves are built around one.', 'info')
+      s.toast('请先放置主体，摄影机运动将围绕该主体生成。', 'info')
       return
     }
     const entity = this.docScene.entities.find((e) => e.id === subject.id)!
@@ -1761,7 +1762,7 @@ export class SceneManager {
     })
     s.setSelection({ kind: 'camera' })
     s.toast(
-      `${preset.name} on ${entity.label?.text || entity.name} — ▶ to watch, then drag any mark to adjust.`,
+      `已为 ${entity.label?.text || entity.name} 应用${zh(preset.name)}。点击 ▶ 预览，拖动走位点可调整。`,
       'success'
     )
   }
@@ -1835,8 +1836,8 @@ export class SceneManager {
     if (this.recTarget === 'camera') {
       s.toast(
         this.recPlaybackSynced
-          ? 'Recording camera — the blocking replays while you fly the viewport. Stops at the end of the shot.'
-          : 'Recording — fly the viewport; the shot camera follows. Click ■ to stop.',
+          ? '正在录制摄影机：移动视口时，场景走位同步回放，镜头结束时停止。'
+          : '正在录制：移动视口，摄影机将跟随。点击 ■ 停止。',
         'info'
       )
     } else {
@@ -1848,8 +1849,8 @@ export class SceneManager {
       this.controls.enableZoom = false // wheel = altitude while puppeteering
       s.toast(
         this.recPlaybackSynced
-          ? 'Recording performance — steer with the cursor while the rest replays. Scroll = altitude.'
-          : 'Recording performance — steer with the cursor; scroll wheel raises/lowers it (fly a plate, a plane, debris). Click ■ to stop.',
+          ? '正在录制表演：用光标控制角色，其余运动同步回放。滚轮调整高度。'
+          : '正在录制表演：用光标控制对象，滚轮调整高度（可用于盘子、飞机或碎片）。点击 ■ 停止。',
         'info'
       )
     }
@@ -1874,7 +1875,7 @@ export class SceneManager {
     const samples = this.recSamples
     this.recSamples = []
     if (!shotId || samples.length < 5) {
-      if (samples.length > 0) s.toast('Recording too short — nothing saved.', 'info')
+      if (samples.length > 0) s.toast('录制时间太短，未保存。', 'info')
       return
     }
     const length = this.recPlaybackSynced
@@ -1918,7 +1919,7 @@ export class SceneManager {
     s.setTime(0)
     s.setPlaying(true)
     s.toast(
-      `Recorded ${length.toFixed(1)}s — playing back your shot. Press C to exit the camera view.`,
+      `已录制 ${length.toFixed(1)} 秒，正在回放镜头。按 C 退出摄影机视图。`,
       'success'
     )
   }
@@ -1931,7 +1932,7 @@ export class SceneManager {
     const samples = this.entitySamples
     this.entitySamples = []
     if (!shotId || samples.length < 5) {
-      if (samples.length > 0) s.toast('Recording too short — nothing saved.', 'info')
+      if (samples.length > 0) s.toast('录制时间太短，未保存。', 'info')
       return
     }
     const length = this.recPlaybackSynced
@@ -1984,7 +1985,7 @@ export class SceneManager {
     s.setTime(0)
     s.setPlaying(true)
     s.toast(
-      `Performance recorded — ${marks.length} marks over ${length.toFixed(1)}s. Now select the camera and ● Record to fly it while this replays.`,
+      `表演已录制：${length.toFixed(1)} 秒，共 ${marks.length} 个走位点。现在选择摄影机，点击 ● 录制，即可在表演回放时录制摄影机运动。`,
       'success'
     )
   }
