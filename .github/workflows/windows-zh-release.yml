@@ -36,7 +36,7 @@ jobs:
       - run: npm run lint
       - run: npm test
       - name: Build audited native Windows Chinese NSIS and ZIP
-        run: node deploy/package-windows-zh.mjs
+        run: node .github/scripts/windows-build.mjs
       - name: Configure Windows smoke paths
         shell: pwsh
         run: |
